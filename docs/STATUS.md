@@ -31,8 +31,8 @@
 | UI | 暖色渐变/毛玻璃/弥散阴影/动效/减弱动态效果/深浅色 | 已完成（对比度有自动测试） | 中端机 50fps **未实测** |
 | 地图样式 | 高德自定义样式 | 部分完成 | 需在高德控制台生成 style.data 放入 assets/map_style/（代码已接入）；未提供则用默认样式 |
 | 隐私 | 后台预览模糊遮罩、日志不含坐标 | 已完成 | |
-| 打包 | Android APK（split + 通用）、R8 规则、keystore 脚本 | 部分完成 | 脚本与 CI 已写；本云端环境无法下载 Android SDK(dl.google.com 被拒)，**APK 未在本地构建**，以 GitHub Actions 结果为准（见下） |
-| 打包 | 未签名 IPA（含/不含扩展）、build_ipa.sh、macOS CI | 部分完成 | 同上，依赖 CI 结果 |
+| 打包 | Android APK（split + 通用）、R8 规则、keystore 脚本 | 部分完成 | 脚本与 CI 已写；本云端环境无法下载 Android SDK(dl.google.com 被拒)，APK 由 GitHub Actions 构建（run 41690254158，ubuntu）：split-per-abi + 通用 APK 已成功产出并上传为 artifact；未装机运行（未实测） |
+| 打包 | 未签名 IPA（含/不含扩展）、build_ipa.sh、macOS CI | 部分完成 | macos-26 runner 上 noext 与 widgets 两个未签名 IPA 均构建成功并上传 artifact；Flutter 将部署目标升至 iOS 15；未在真机/侧载验证（未实测） |
 
 ## 你需要填写/准备的东西
 1. Supabase：新建项目→执行 `supabase/migrations/0001_init.sql`→取 URL 与 anon key（docs/SETUP.md）。
