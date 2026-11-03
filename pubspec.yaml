@@ -64,3 +64,6 @@ flutter:
   assets:
     - assets/map_style/
     - assets/lottie/
+
+dependency_overrides:
+  permission_handler_android: 13.0.1
