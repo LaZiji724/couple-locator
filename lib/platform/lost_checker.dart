@@ -12,11 +12,12 @@ import 'notifications.dart';
 /// B3 失联提醒：依据服务端明文心跳时间戳判断（不含位置）。
 /// 前台由 App 每分钟调用；后台由 WorkManager 周期任务（约 15 分钟）调用。
 class LostChecker {
-  LostChecker({required this.backend, required this.settings, this.db, this.keys});
+  LostChecker({required this.backend, required this.settings, this.db, this.keys, this.notify});
   final Backend backend;
   final SettingsStore settings;
   final AppDb? db;
   final KeyStore? keys;
+  final Future<void> Function(String title, String body)? notify; // 测试注入
 
   /// 返回是否已发出通知。同一段失联只通知一次（以对方最后心跳时间为键）。
   Future<bool> check({DateTime? now}) async {
@@ -52,12 +53,13 @@ class LostChecker {
         } catch (_) {}
       }
       final name = (await backend.getProfile(partner))?.nickname ?? '对方';
-      await LocalNotifier.instance.show(
-        NotifIds.lost,
-        '$name 失联了',
-        '对方已失联 ${silent.inMinutes} 分钟${where.isEmpty ? '' : '，最后位置在 $where'}（${hm(p.heartbeatAt.toLocal())}）',
-        payload: 'lost',
-      );
+      final title = '$name 失联了';
+      final body = '对方已失联 ${silent.inMinutes} 分钟${where.isEmpty ? '' : '，最后位置在 $where'}（${hm(p.heartbeatAt.toLocal())}）';
+      if (notify != null) {
+        await notify!(title, body);
+      } else {
+        await LocalNotifier.instance.show(NotifIds.lost, title, body, payload: 'lost');
+      }
       await settings.setLastLostNotified(key);
       return true;
     } catch (e) {

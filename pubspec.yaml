@@ -31,7 +31,8 @@ dependencies:
   live_activities: ^2.6.0
   amap_map: ^1.0.15
   x_amap_base: any
-  phosphor_flutter: ^2.1.0
+  phosphor_flutter:
+    path: packages/phosphor_flutter
   lottie: ^3.3.0
   fl_chart: ^1.0.0
   table_calendar: ^3.2.0
