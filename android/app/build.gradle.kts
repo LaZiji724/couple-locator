@@ -14,7 +14,7 @@ val keyProps = Properties().apply {
 
 android {
     namespace = "com.couple.couple_locator"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
