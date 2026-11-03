@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:amap_map/amap_map.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,7 +13,10 @@ import 'core/config/app_config.dart';
 import 'platform/background_tasks.dart';
 import 'platform/bootstrap.dart';
 import 'platform/notifications.dart';
+import 'platform/ios_location_channel.dart';
+import 'platform/permissions.dart';
 import 'platform/tracker_service.dart';
+import 'data/repo/settings_store.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +34,14 @@ Future<void> main() async {
     try {
       await BackgroundTasks.register();
     } catch (_) {}
+  }
+  // iOS：被「显著位置变化」从终止状态唤醒时，直接恢复连续定位并补传
+  if (AppConfig.backendConfigured && Platform.isIOS) {
+    final st = await SettingsStore.open();
+    if (st.trackingEnabled && await PermissionService.hasLocation()) {
+      await TrackerService.instance.start();
+      IosLocationChannel.startSignificant();
+    }
   }
   runApp(const ProviderScope(child: _AmapInit(child: CoupleApp())));
 }

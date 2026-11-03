@@ -55,3 +55,6 @@ lib/core/config/secrets.dart
 .env
 env/*.json
 !env/example.json
+dist/
+android/app/upload-keystore.jks
+android/key.properties

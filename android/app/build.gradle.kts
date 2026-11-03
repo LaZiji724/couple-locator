@@ -1,7 +1,15 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+// 签名配置：android/key.properties（不要提交到仓库，见 docs/BUILD.md）
+val keyProps = Properties().apply {
+    val f = rootProject.file("key.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
 }
 
 android {
@@ -19,7 +27,7 @@ android {
         applicationId = "com.couple.couple_locator"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        minSdk = 26 // Android 8.0
         targetSdk = flutter.targetSdkVersion
         // Uses the version code from pubspec.yaml. When using split APKs, 1000 * ABI_VERSION
         // is added automatically by Flutter. (https://developer.android.com/studio/build/configure-apk-splits#configure-APK-versions)
@@ -27,13 +35,29 @@ android {
         // flag during build.
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        // 高德 Android Key：-PAMAP_ANDROID_KEY=xxx 或环境变量 AMAP_ANDROID_KEY
+        val amapKey = (project.findProperty("AMAP_ANDROID_KEY") as String?) ?: System.getenv("AMAP_ANDROID_KEY") ?: "YOUR_AMAP_ANDROID_KEY"
+        manifestPlaceholders["AMAP_ANDROID_KEY"] = amapKey
+    }
+
+    signingConfigs {
+        create("release") {
+            if (keyProps.containsKey("storeFile")) {
+                storeFile = file(keyProps.getProperty("storeFile"))
+                storePassword = keyProps.getProperty("storePassword")
+                keyAlias = keyProps.getProperty("keyAlias")
+                keyPassword = keyProps.getProperty("keyPassword")
+            }
+        }
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            // 有 key.properties 用正式 keystore，否则回退 debug 签名（仅便于本地试装）
+            signingConfig = if (keyProps.containsKey("storeFile")) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
+            isMinifyEnabled = true // R8
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 }

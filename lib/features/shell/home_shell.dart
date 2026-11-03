@@ -12,7 +12,9 @@ import '../../core/theme/tokens.dart';
 import '../../core/widgets/vibe_widgets.dart';
 import '../../platform/lost_checker.dart';
 import '../../platform/permissions.dart';
+import '../../platform/ios_location_channel.dart';
 import '../../platform/tracker_service.dart';
+import '../../platform/widget_bridge.dart';
 import '../history/history_page.dart';
 import '../interact/interact_page.dart';
 import '../map/map_page.dart';
@@ -35,6 +37,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
       // 已配对 + 有定位权限 → 启动后台上报
       if (await PermissionService.hasLocation()) {
         await TrackerService.instance.start();
+        IosLocationChannel.startSignificant();
       }
     });
     _lost = Timer.periodic(const Duration(minutes: 1), (_) => _checkLost());
@@ -62,6 +65,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   @override
   Widget build(BuildContext context) {
     // 收到对方 SOS 且未确认 → 全屏警报
+    ref.listen(syncProvider, (_, next) => WidgetBridge.instance.update(next));
     ref.listen(syncProvider.select((s) => s.pendingSos), (prev, next) {
       if (next != null && prev == null) context.push('/sos-alert');
     });
