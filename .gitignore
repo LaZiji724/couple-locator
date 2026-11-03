@@ -53,3 +53,5 @@ app.*.map.json
 key.properties
 lib/core/config/secrets.dart
 .env
+env/*.json
+!env/example.json

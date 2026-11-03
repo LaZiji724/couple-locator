@@ -1,0 +1,3 @@
+project_id = "couple-locator"
+[functions.check-lost]
+verify_jwt = true

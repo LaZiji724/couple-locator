@@ -7,7 +7,7 @@ class LatLngD {
   final double lat;
   final double lng;
   @override
-  bool operator ==(Object o) => o is LatLngD && o.lat == lat && o.lng == lng;
+  bool operator ==(Object other) => other is LatLngD && other.lat == lat && other.lng == lng;
   @override
   int get hashCode => Object.hash(lat, lng);
   @override

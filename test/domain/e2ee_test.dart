@@ -50,4 +50,9 @@ void main() {
     expect(await KeyBackup.restore(backup, '对的口令123'), a.priv);
     expect(() => KeyBackup.restore(backup, '错的'), throwsA(isA<SecretBoxAuthenticationError>()));
   });
+
+  test('由私钥可恢复出同一公钥', () async {
+    final a = await E2ee.generateKeyPair();
+    expect(await E2ee.publicKeyFromPrivate(a.priv), a.pub);
+  });
 }

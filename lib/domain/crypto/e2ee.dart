@@ -21,6 +21,12 @@ class E2ee {
     );
   }
 
+  /// 由私钥种子恢复公钥（备份恢复时使用）。
+  static Future<Uint8List> publicKeyFromPrivate(Uint8List priv) async {
+    final kp = await _x25519.newKeyPairFromSeed(priv);
+    return Uint8List.fromList((await kp.extractPublicKey()).bytes);
+  }
+
   /// ECDH + HKDF 派生对称密钥。双方传入顺序无关（info 内部排序公钥）。
   static Future<SecretKey> deriveSharedKey({
     required Uint8List myPriv,

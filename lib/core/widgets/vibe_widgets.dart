@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:ui';
 
@@ -371,8 +372,10 @@ class AvatarBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final inner = imageUrl != null && imageUrl!.isNotEmpty
-        ? ClipOval(child: Image.network(imageUrl!, fit: BoxFit.cover, width: size, height: size,
-            errorBuilder: (_, _, _) => _emoji()))
+        ? ClipOval(
+            child: imageUrl!.startsWith('data:')
+                ? Image.memory(base64Decode(imageUrl!.split(',').last), fit: BoxFit.cover, width: size, height: size, errorBuilder: (_, _, _) => _emoji())
+                : Image.network(imageUrl!, fit: BoxFit.cover, width: size, height: size, errorBuilder: (_, _, _) => _emoji()))
         : _emoji();
     Widget w = Container(
       width: size,
