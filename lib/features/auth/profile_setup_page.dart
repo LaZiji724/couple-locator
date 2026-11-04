@@ -85,7 +85,7 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
     final pal = PersonalPalette.byId(_theme);
     return Scaffold(
       appBar: widget.editing ? AppBar(title: const Text('编辑资料')) : null,
-      body: FlowingBlobs(
+      body: PaperBackdrop(
         child: SafeArea(
           child: !_loaded
               ? const Center(child: CircularProgressIndicator())
@@ -113,7 +113,7 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
                           decoration: BoxDecoration(
                             color: v.surface,
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: _emoji == e && _photo == null ? pal.start : Colors.transparent, width: 2.5),
+                            border: Border.all(color: _emoji == e && _photo == null ? pal.start : Colors.transparent, width: 2),
                           ),
                           child: Text(e, style: const TextStyle(fontSize: 26)),
                         ),
@@ -134,16 +134,16 @@ class _ProfileSetupPageState extends ConsumerState<ProfileSetupPage> {
                             curve: Curves.easeOutBack,
                             width: _theme == p.id ? 58 : 50,
                             height: _theme == p.id ? 58 : 50,
-                            decoration: BoxDecoration(shape: BoxShape.circle, gradient: p.gradient, border: Border.all(color: Colors.white, width: _theme == p.id ? 4 : 0), boxShadow: AppShadows.soft(p.start, dark: v.isDark)),
+                            decoration: BoxDecoration(shape: BoxShape.circle, gradient: p.gradient, border: Border.all(color: _theme == p.id ? v.ink : Colors.transparent, width: 2)),
                             child: _theme == p.id ? const Icon(PhosphorIconsBold.check, color: Colors.white) : null,
                           ),
                           const SizedBox(height: 4),
-                          Text(p.name, style: TextStyle(fontSize: 11, color: v.inkSoft)),
+                          Text(p.name, style: TextStyle(fontSize: 12, color: v.inkSoft)),
                         ]),
                       ),
                   ]),
                   const SizedBox(height: 28),
-                  GradientButton(label: widget.editing ? '保存' : '完成，去配对', busy: _busy, onTap: _busy ? null : _save),
+                  PrimaryButton(label: widget.editing ? '保存' : '完成，去配对', busy: _busy, onTap: _busy ? null : _save),
                 ]),
         ),
       ),

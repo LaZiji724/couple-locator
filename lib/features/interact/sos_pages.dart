@@ -8,7 +8,6 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../app/providers.dart';
-import '../../core/theme/app_theme.dart';
 import '../../core/widgets/effects.dart';
 import '../../core/widgets/vibe_widgets.dart';
 import '../../domain/models/status.dart';
@@ -73,7 +72,7 @@ class _SosAlertPageState extends ConsumerState<SosAlertPage> {
                 const Spacer(),
                 const Text('🚨', style: TextStyle(fontSize: 84)),
                 const SizedBox(height: 12),
-                Text('$name 需要帮助！', textAlign: TextAlign.center, style: const TextStyle(fontFamily: AppTheme.displayFont, fontSize: 38, color: Colors.white)),
+                Text('$name 需要帮助！', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 38, color: Colors.white)),
                 const SizedBox(height: 8),
                 Text(p == null ? '正在获取 TA 的位置…' : 'TA 的位置正在每 3 秒更新', style: const TextStyle(color: Colors.white, fontSize: 16)),
                 const Spacer(),
@@ -146,7 +145,7 @@ class _SosSenderPageState extends ConsumerState<SosSenderPage> {
                 const Spacer(),
                 const Text('📡', style: TextStyle(fontSize: 76)),
                 const SizedBox(height: 12),
-                const Text('SOS 进行中', style: TextStyle(fontFamily: AppTheme.displayFont, fontSize: 40, color: Colors.white)),
+                const Text('SOS 进行中', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 40, color: Colors.white)),
                 const SizedBox(height: 10),
                 Text(acked ? 'TA 已确认收到，正在联系你' : '正在每 3 秒向 TA 发送你的位置', textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 16)),
                 const Spacer(),

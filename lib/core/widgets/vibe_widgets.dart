@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../theme/app_theme.dart';
 import '../theme/motion.dart';
@@ -11,7 +11,7 @@ import '../theme/tokens.dart';
 
 /// 按下挤压、松开弹簧回弹并带触感反馈的包装器。
 class Squish extends StatefulWidget {
-  const Squish({super.key, required this.child, this.onTap, this.onLongPress, this.scale = 0.94});
+  const Squish({super.key, required this.child, this.onTap, this.onLongPress, this.scale = 0.97});
   final Widget child;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
@@ -51,29 +51,26 @@ class _SquishState extends State<Squish> {
   }
 }
 
-/// 全胶囊渐变主按钮。
-class GradientButton extends StatelessWidget {
-  const GradientButton({
+/// 主按钮：纯色强调色 + 极轻的顶部提亮与描边，按下下沉 1px。每屏只放一个。
+class PrimaryButton extends StatelessWidget {
+  const PrimaryButton({
     super.key,
     required this.label,
     this.onTap,
     this.icon,
-    this.gradient,
-    this.height = 56,
+    this.height = 52,
     this.expand = true,
     this.busy = false,
   });
   final String label;
   final VoidCallback? onTap;
   final IconData? icon;
-  final Gradient? gradient;
   final double height;
   final bool expand;
   final bool busy;
 
   @override
   Widget build(BuildContext context) {
-    final g = gradient ?? AppColors.sunrise;
     final disabled = onTap == null || busy;
     final content = Row(
       mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
@@ -83,14 +80,14 @@ class GradientButton extends StatelessWidget {
           const SizedBox(
             width: 20,
             height: 20,
-            child: CircularProgressIndicator(strokeWidth: 2.5, color: AppColors.onGradient),
+            child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.onAccent),
           )
         else if (icon != null)
-          Icon(icon, color: AppColors.onGradient, size: 22),
-        if (busy || icon != null) const SizedBox(width: 10),
+          Icon(icon, color: AppColors.onAccent, size: 20),
+        if (busy || icon != null) const SizedBox(width: 8),
         Text(label,
             style: const TextStyle(
-                color: AppColors.onGradient, fontSize: 17, fontWeight: FontWeight.w700)),
+                color: AppColors.onAccent, fontSize: 15, fontWeight: FontWeight.w600)),
       ],
     );
     return Squish(
@@ -100,11 +97,19 @@ class GradientButton extends StatelessWidget {
         duration: Motion.fast,
         child: Container(
           height: height,
-          padding: const EdgeInsets.symmetric(horizontal: 28),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           decoration: BoxDecoration(
-            gradient: g,
-            borderRadius: BorderRadius.circular(AppRadii.pill),
-            boxShadow: AppShadows.soft(AppColors.coral, dark: context.vibes.isDark),
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFFD14A64), AppColors.accent],
+            ),
+            borderRadius: BorderRadius.circular(AppRadii.small),
+            border: Border.all(color: const Color(0xFFA8304A), width: 1),
+            boxShadow: [
+              BoxShadow(color: Colors.black.withValues(alpha: 0.12), blurRadius: 2, offset: const Offset(0, 1)),
+              BoxShadow(color: AppColors.accent.withValues(alpha: 0.22), blurRadius: 10, spreadRadius: -3, offset: const Offset(0, 4)),
+            ],
           ),
           child: content,
         ),
@@ -113,7 +118,7 @@ class GradientButton extends StatelessWidget {
   }
 }
 
-/// 次级胶囊按钮（描边/浅底）。
+/// 次级按钮：中性浅底 + 细边框，文字用墨色（危险操作可传 [color]）。
 class SoftButton extends StatelessWidget {
   const SoftButton({super.key, required this.label, this.onTap, this.icon, this.color, this.height = 48});
   final String label;
@@ -125,26 +130,32 @@ class SoftButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final v = context.vibes;
-    final c = color ?? v.accentText;
+    final c = color ?? v.ink;
     return Squish(
       onTap: onTap,
-      child: Container(
-        height: height,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        decoration: BoxDecoration(
-          color: c.withValues(alpha: v.isDark ? 0.18 : 0.10),
-          borderRadius: BorderRadius.circular(AppRadii.pill),
+      child: AnimatedOpacity(
+        opacity: onTap == null ? 0.5 : 1,
+        duration: Motion.fast,
+        child: Container(
+          height: height,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: v.surfaceHigh,
+            borderRadius: BorderRadius.circular(AppRadii.small),
+            border: Border.all(color: v.hairline, width: 0.5),
+          ),
+          child: Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.center, children: [
+            if (icon != null) ...[Icon(icon, size: 18, color: c), const SizedBox(width: 8)],
+            Text(label, style: TextStyle(color: c, fontWeight: FontWeight.w600, fontSize: 15)),
+          ]),
         ),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          if (icon != null) ...[Icon(icon, size: 20, color: c), const SizedBox(width: 8)],
-          Text(label, style: TextStyle(color: c, fontWeight: FontWeight.w600, fontSize: 15)),
-        ]),
       ),
     );
   }
 }
 
-/// 毛玻璃面板，叠在地图上使用。
+/// 毛玻璃浮层，叠在地图上使用。这是少数允许投影的容器。
 class GlassPanel extends StatelessWidget {
   const GlassPanel({
     super.key,
@@ -164,7 +175,7 @@ class GlassPanel extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(radius),
-        boxShadow: AppShadows.soft(AppColors.coral, dark: v.isDark),
+        boxShadow: AppShadows.soft(Colors.black, dark: v.isDark),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(radius),
@@ -175,7 +186,7 @@ class GlassPanel extends StatelessWidget {
             decoration: BoxDecoration(
               color: v.glass,
               borderRadius: BorderRadius.circular(radius),
-              border: Border.all(color: v.glassBorder),
+              border: Border.all(color: v.glassBorder, width: 0.5),
             ),
             child: child,
           ),
@@ -207,9 +218,10 @@ class GlassIconButton extends StatelessWidget {
   }
 }
 
-/// 白/深色卡片，彩色弥散阴影。
+/// 平铺卡片：纯色底 + 0.5px 细边框，不带阴影。
+/// [tint] 与 [gradient] 仅为兼容旧调用，不再使用。
 class VibeCard extends StatelessWidget {
-  const VibeCard({super.key, required this.child, this.padding = const EdgeInsets.all(18), this.tint, this.gradient, this.onTap});
+  const VibeCard({super.key, required this.child, this.padding = const EdgeInsets.all(16), this.tint, this.gradient, this.onTap});
   final Widget child;
   final EdgeInsetsGeometry padding;
   final Color? tint;
@@ -222,14 +234,13 @@ class VibeCard extends StatelessWidget {
     final card = Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: gradient == null ? v.surface : null,
-        gradient: gradient,
+        color: v.surface,
         borderRadius: BorderRadius.circular(AppRadii.card),
-        boxShadow: AppShadows.soft(tint ?? AppColors.peach, dark: v.isDark),
+        border: Border.all(color: v.hairline, width: 0.5),
       ),
       child: child,
     );
-    return onTap == null ? card : Squish(onTap: onTap, scale: 0.97, child: card);
+    return onTap == null ? card : Squish(onTap: onTap, child: card);
   }
 }
 
@@ -276,87 +287,14 @@ class RollingNumber extends StatelessWidget {
   }
 }
 
-/// 首页背景缓慢流动的渐变光斑（地图页不要使用）。
-class FlowingBlobs extends StatefulWidget {
-  const FlowingBlobs({super.key, required this.child});
+/// 页面底：暖纸色纯色背景，不做动画、不加光斑。
+class PaperBackdrop extends StatelessWidget {
+  const PaperBackdrop({super.key, required this.child});
   final Widget child;
-  @override
-  State<FlowingBlobs> createState() => _FlowingBlobsState();
-}
-
-class _FlowingBlobsState extends State<FlowingBlobs> with SingleTickerProviderStateMixin {
-  late final AnimationController _c =
-      AnimationController(vsync: this, duration: const Duration(seconds: 18))..repeat();
-
-  @override
-  void dispose() {
-    _c.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
-    final v = context.vibes;
-    final reduced = Motion.reduced(context);
-    if (reduced) _c.stop();
-    return Stack(children: [
-      Positioned.fill(child: ColoredBox(color: v.bg)),
-      Positioned.fill(
-        child: RepaintBoundary(
-          child: AnimatedBuilder(
-            animation: _c,
-            builder: (_, _) => CustomPaint(painter: _BlobPainter(_c.value, v.isDark)),
-          ),
-        ),
-      ),
-      widget.child,
-    ]);
-  }
-}
-
-class _BlobPainter extends CustomPainter {
-  _BlobPainter(this.t, this.dark);
-  final double t;
-  final bool dark;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final a = dark ? 0.22 : 0.30;
-    final blobs = [
-      (AppColors.coral, 0.15, 0.10, 0.55),
-      (AppColors.sun, 0.85, 0.25, 0.45),
-      (AppColors.mint, 0.30, 0.85, 0.50),
-    ];
-    for (var i = 0; i < blobs.length; i++) {
-      final (color, bx, by, r) = blobs[i];
-      final ph = t * 2 * math.pi + i * 2.1;
-      final c = Offset(size.width * (bx + 0.08 * math.sin(ph)), size.height * (by + 0.05 * math.cos(ph * 0.8)));
-      final radius = size.shortestSide * r;
-      final paint = Paint()
-        ..shader = RadialGradient(colors: [color.withValues(alpha: a), color.withValues(alpha: 0)])
-            .createShader(Rect.fromCircle(center: c, radius: radius));
-      canvas.drawCircle(c, radius, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(_BlobPainter old) => old.t != t || old.dark != dark;
-}
-
-/// 渐变文字。
-class GradientText extends StatelessWidget {
-  const GradientText(this.text, {super.key, this.style, this.gradient});
-  final String text;
-  final TextStyle? style;
-  final Gradient? gradient;
-
-  @override
-  Widget build(BuildContext context) {
-    return ShaderMask(
-      shaderCallback: (r) => (gradient ?? AppColors.sunrise).createShader(r),
-      blendMode: BlendMode.srcIn,
-      child: Text(text, style: style),
-    );
+    return ColoredBox(color: context.vibes.bg, child: child);
   }
 }
 
@@ -381,10 +319,9 @@ class AvatarBubble extends StatelessWidget {
       width: size,
       height: size,
       padding: EdgeInsets.all(size * 0.08),
-      decoration: BoxDecoration(shape: BoxShape.circle, gradient: palette.gradient,
-          boxShadow: AppShadows.soft(palette.start, dark: context.vibes.isDark)),
+      decoration: BoxDecoration(shape: BoxShape.circle, gradient: palette.gradient),
       child: Container(
-        decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+        decoration: BoxDecoration(shape: BoxShape.circle, color: context.vibes.surface),
         padding: EdgeInsets.all(size * 0.03),
         child: ClipOval(child: inner),
       ),
@@ -409,56 +346,55 @@ class AvatarBubble extends StatelessWidget {
   ];
 }
 
-/// 空状态：可爱的扁平小团子插画 + 文案。
+/// 空状态：缩小版的真实界面（占位条 + 图标），只在下一步操作上用强调色。
 class CuteEmpty extends StatelessWidget {
-  const CuteEmpty({super.key, required this.title, this.subtitle, this.emoji = '🌷', this.action});
+  const CuteEmpty({super.key, required this.title, this.subtitle, this.icon = PhosphorIconsRegular.mapPin, this.action});
   final String title;
   final String? subtitle;
-  final String emoji;
+  final IconData icon;
   final Widget? action;
 
   @override
   Widget build(BuildContext context) {
     final v = context.vibes;
+    Widget bar(double w) => Container(
+        width: w,
+        height: 8,
+        decoration: BoxDecoration(color: v.hairline, borderRadius: BorderRadius.circular(4)));
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          SizedBox(width: 160, height: 140, child: CustomPaint(painter: _BuddyPainter(), child: Center(
-            child: Padding(padding: const EdgeInsets.only(top: 52), child: Text(emoji, style: const TextStyle(fontSize: 28)))))),
-          const SizedBox(height: 16),
+          Container(
+            width: 160,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: v.surface,
+              borderRadius: BorderRadius.circular(AppRadii.card),
+              border: Border.all(color: v.hairline, width: 0.5),
+            ),
+            child: Row(children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(color: v.surfaceHigh, borderRadius: BorderRadius.circular(AppRadii.small)),
+                child: Icon(icon, size: 20, color: v.accentText),
+              ),
+              const SizedBox(width: 12),
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [bar(48), const SizedBox(height: 8), bar(32)]),
+            ]),
+          ),
+          const SizedBox(height: 24),
           Text(title, style: Theme.of(context).textTheme.titleLarge, textAlign: TextAlign.center),
           if (subtitle != null) ...[
             const SizedBox(height: 8),
             Text(subtitle!, style: TextStyle(color: v.inkSoft), textAlign: TextAlign.center),
           ],
-          if (action != null) ...[const SizedBox(height: 20), action!],
+          if (action != null) ...[const SizedBox(height: 24), action!],
         ]),
       ),
     );
   }
-}
-
-class _BuddyPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size s) {
-    final body = Rect.fromCenter(center: Offset(s.width / 2, s.height * 0.58), width: s.width * 0.7, height: s.height * 0.72);
-    canvas.drawOval(body.shift(const Offset(0, 8)), Paint()..color = AppColors.coral.withValues(alpha: 0.15));
-    canvas.drawOval(body, Paint()..shader = AppColors.sunrise.createShader(body));
-    final eye = Paint()..color = AppColors.onGradient;
-    canvas.drawCircle(Offset(s.width * 0.42, s.height * 0.48), 4, eye);
-    canvas.drawCircle(Offset(s.width * 0.58, s.height * 0.48), 4, eye);
-    final blush = Paint()..color = Colors.white.withValues(alpha: 0.55);
-    canvas.drawCircle(Offset(s.width * 0.35, s.height * 0.56), 7, blush);
-    canvas.drawCircle(Offset(s.width * 0.65, s.height * 0.56), 7, blush);
-    final sparkle = Paint()..color = AppColors.mint;
-    canvas.drawCircle(Offset(s.width * 0.12, s.height * 0.2), 5, sparkle);
-    canvas.drawCircle(Offset(s.width * 0.9, s.height * 0.3), 4, Paint()..color = AppColors.sky);
-    canvas.drawCircle(Offset(s.width * 0.82, s.height * 0.08), 3, Paint()..color = AppColors.grape);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 /// 分组标题。
@@ -467,7 +403,7 @@ class SectionTitle extends StatelessWidget {
   final String text;
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.fromLTRB(8, 20, 8, 10),
-        child: Text(text, style: TextStyle(color: context.vibes.inkSoft, fontWeight: FontWeight.w700, fontSize: 13, letterSpacing: 1)),
+        padding: const EdgeInsets.fromLTRB(4, 24, 4, 8),
+        child: Text(text, style: TextStyle(color: context.vibes.inkSoft, fontWeight: FontWeight.w600, fontSize: 12)),
       );
 }

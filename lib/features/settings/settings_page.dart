@@ -46,14 +46,13 @@ class SettingsPage extends ConsumerWidget {
       } catch (_) {}
     }
 
-    return FlowingBlobs(
+    return PaperBackdrop(
       child: SafeArea(
         bottom: false,
         child: ListView(padding: const EdgeInsets.fromLTRB(20, 16, 20, 120), children: [
           Text('我的', style: Theme.of(context).textTheme.headlineMedium),
           const SizedBox(height: 14),
           VibeCard(
-            tint: pal.start,
             onTap: () => context.push('/profile'),
             child: Row(children: [
               Hero(tag: 'my-avatar', child: AvatarBubble(palette: pal, emoji: s.me?.avatarEmoji, imageUrl: s.me?.avatarUrl, size: 64)),
@@ -68,7 +67,7 @@ class SettingsPage extends ConsumerWidget {
           const SectionTitle('共享'),
           VibeCard(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text('上报频率', style: TextStyle(fontWeight: FontWeight.w800)),
+              const Text('上报频率', style: TextStyle(fontWeight: FontWeight.w600)),
               const SizedBox(height: 4),
               Text('省电 ×2 间隔 / 均衡 / 精准 ×0.5 间隔', style: TextStyle(color: v.inkSoft, fontSize: 12)),
               const SizedBox(height: 10),
@@ -83,9 +82,9 @@ class SettingsPage extends ConsumerWidget {
               ),
               const Divider(height: 28),
               Row(children: [
-                const Text('失联提醒阈值', style: TextStyle(fontWeight: FontWeight.w800)),
+                const Text('失联提醒阈值', style: TextStyle(fontWeight: FontWeight.w600)),
                 const Spacer(),
-                Text('${store.lostMinutes} 分钟', style: TextStyle(color: v.accentText, fontWeight: FontWeight.w800)),
+                Text('${store.lostMinutes} 分钟', style: TextStyle(color: v.accentText, fontWeight: FontWeight.w600)),
               ]),
               Slider(
                 min: 10,
@@ -126,7 +125,7 @@ class SettingsPage extends ConsumerWidget {
                 },
               ),
               const SizedBox(height: 14),
-              const Text('我的专属颜色', style: TextStyle(fontWeight: FontWeight.w800)),
+              const Text('我的专属颜色', style: TextStyle(fontWeight: FontWeight.w600)),
               const SizedBox(height: 10),
               Wrap(spacing: 12, runSpacing: 12, children: [
                 for (final p in PersonalPalette.all)
@@ -235,7 +234,7 @@ class DiagnosticsPage extends StatelessWidget {
     final v = context.vibes;
     return Scaffold(
       appBar: AppBar(title: const Text('上报状态与日志')),
-      body: FlowingBlobs(
+      body: PaperBackdrop(
         child: SafeArea(
           child: ValueListenableBuilder<List<String>>(
             valueListenable: AppLog.entries,
@@ -243,14 +242,14 @@ class DiagnosticsPage extends StatelessWidget {
               VibeCard(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text('最近一次成功上报', style: TextStyle(color: v.inkSoft)),
-                  Text(AppLog.lastUploadOk?.replaceFirst('T', ' ').substring(0, 19) ?? '（本次启动尚无；后台服务的记录在服务端 diag_logs）', style: const TextStyle(fontWeight: FontWeight.w800)),
+                  Text(AppLog.lastUploadOk?.replaceFirst('T', ' ').substring(0, 19) ?? '（本次启动尚无；后台服务的记录在服务端 diag_logs）', style: const TextStyle(fontWeight: FontWeight.w600)),
                   const SizedBox(height: 12),
                   Text('最近一次失败原因', style: TextStyle(color: v.inkSoft)),
-                  Text(AppLog.lastUploadError ?? '无', style: TextStyle(fontWeight: FontWeight.w800, color: AppLog.lastUploadError == null ? v.ink : v.danger)),
+                  Text(AppLog.lastUploadError ?? '无', style: TextStyle(fontWeight: FontWeight.w600, color: AppLog.lastUploadError == null ? v.ink : v.danger)),
                 ]),
               ),
               const SectionTitle('日志（已隐去坐标）'),
-              for (final l in lines.reversed) Padding(padding: const EdgeInsets.only(bottom: 4), child: Text(l, style: TextStyle(fontSize: 11.5, fontFamily: 'monospace', color: v.inkSoft))),
+              for (final l in lines.reversed) Padding(padding: const EdgeInsets.only(bottom: 4), child: Text(l, style: TextStyle(fontSize: 12, fontFamily: 'monospace', color: v.inkSoft))),
               if (lines.isEmpty) Text('暂无日志', style: TextStyle(color: v.inkSoft)),
             ]),
           ),

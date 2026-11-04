@@ -88,7 +88,7 @@ class _PairingPageState extends ConsumerState<PairingPage> with SingleTickerProv
     final remain = _expires == null ? null : _expires!.difference(DateTime.now());
     final expired = remain != null && remain.isNegative;
     return Scaffold(
-      body: FlowingBlobs(
+      body: PaperBackdrop(
         child: SafeArea(
           child: Column(children: [
             Padding(
@@ -106,15 +106,15 @@ class _PairingPageState extends ConsumerState<PairingPage> with SingleTickerProv
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Container(
-                decoration: BoxDecoration(color: v.surface.withValues(alpha: 0.7), borderRadius: BorderRadius.circular(999)),
+                decoration: BoxDecoration(color: v.surfaceHigh, borderRadius: BorderRadius.circular(999)),
                 child: TabBar(
                   controller: _tab,
                   dividerColor: Colors.transparent,
                   indicatorSize: TabBarIndicatorSize.tab,
-                  indicator: BoxDecoration(gradient: AppColors.sunrise, borderRadius: BorderRadius.circular(999)),
-                  labelColor: AppColors.onGradient,
+                  indicator: BoxDecoration(color: AppColors.accent, borderRadius: BorderRadius.circular(999)),
+                  labelColor: AppColors.onAccent,
                   unselectedLabelColor: v.inkSoft,
-                  labelStyle: const TextStyle(fontWeight: FontWeight.w800),
+                  labelStyle: const TextStyle(fontWeight: FontWeight.w600),
                   tabs: const [Tab(text: '我来邀请'), Tab(text: '我有邀请码')],
                 ),
               ),
@@ -131,7 +131,7 @@ class _PairingPageState extends ConsumerState<PairingPage> with SingleTickerProv
                         const SizedBox(height: 8),
                         Text('生成一个 10 分钟有效的一次性邀请码，发给 TA 或让 TA 扫码', textAlign: TextAlign.center, style: TextStyle(color: v.inkSoft)),
                         const SizedBox(height: 20),
-                        GradientButton(label: '生成邀请码', busy: _busy, onTap: _busy ? null : _create),
+                        PrimaryButton(label: '生成邀请码', busy: _busy, onTap: _busy ? null : _create),
                       ] else ...[
                         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                           for (final (i, ch) in _code!.split('').indexed)
@@ -142,15 +142,15 @@ class _PairingPageState extends ConsumerState<PairingPage> with SingleTickerProv
                                 height: 56,
                                 margin: const EdgeInsets.symmetric(horizontal: 3),
                                 alignment: Alignment.center,
-                                decoration: BoxDecoration(gradient: AppColors.sunrise, borderRadius: BorderRadius.circular(16)),
-                                child: Text(ch, style: const TextStyle(fontFamily: AppTheme.displayFont, fontSize: 30, color: AppColors.onGradient)),
+                                decoration: BoxDecoration(color: AppColors.accent, borderRadius: BorderRadius.circular(AppRadii.small)),
+                                child: Text(ch, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 30, color: AppColors.onAccent)),
                               ),
                             ),
                         ]),
                         const SizedBox(height: 18),
                         Container(
                           padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+                          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(AppRadii.small)),
                           child: QrImageView(data: 'couple-locator://pair/$_code', size: 180, eyeStyle: const QrEyeStyle(eyeShape: QrEyeShape.circle, color: Color(0xFF3A1030)), dataModuleStyle: const QrDataModuleStyle(dataModuleShape: QrDataModuleShape.circle, color: Color(0xFF3A1030))),
                         ),
                         const SizedBox(height: 14),
@@ -165,7 +165,7 @@ class _PairingPageState extends ConsumerState<PairingPage> with SingleTickerProv
                           Expanded(child: SoftButton(label: '重新生成', icon: PhosphorIconsRegular.arrowsClockwise, onTap: _busy ? null : _create)),
                         ]),
                         const SizedBox(height: 10),
-                        Text('等待 TA 输入…配对成功会自动跳转', style: TextStyle(color: v.inkSoft, fontSize: 12.5)),
+                        Text('等待 TA 输入…配对成功会自动跳转', style: TextStyle(color: v.inkSoft, fontSize: 12)),
                       ],
                     ]),
                   ),
@@ -182,13 +182,13 @@ class _PairingPageState extends ConsumerState<PairingPage> with SingleTickerProv
                         keyboardType: TextInputType.number,
                         maxLength: 6,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(fontFamily: AppTheme.displayFont, fontSize: 32, letterSpacing: 8),
+                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 32, letterSpacing: 8),
                         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                         decoration: const InputDecoration(hintText: '000000', counterText: ''),
                         onSubmitted: _redeem,
                       ),
                       const SizedBox(height: 16),
-                      GradientButton(label: '配对', busy: _busy, onTap: _busy ? null : () => _redeem(_input.text.trim())),
+                      PrimaryButton(label: '配对', busy: _busy, onTap: _busy ? null : () => _redeem(_input.text.trim())),
                       const SizedBox(height: 12),
                       SoftButton(label: '扫码', icon: PhosphorIconsRegular.qrCode, onTap: _scan),
                     ]),
@@ -251,7 +251,7 @@ class _PairedCelebrationPageState extends ConsumerState<PairedCelebrationPage> w
     final v = context.vibes;
     final w = MediaQuery.sizeOf(context).width;
     return Scaffold(
-      body: FlowingBlobs(
+      body: PaperBackdrop(
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -281,13 +281,13 @@ class _PairedCelebrationPageState extends ConsumerState<PairedCelebrationPage> w
                 child: Column(children: [
                   Text('安全码（请和 TA 当面核对）', style: TextStyle(color: v.inkSoft, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 10),
-                  Text(s.channel?.safetyCode ?? '等待对方密钥…', textAlign: TextAlign.center, style: const TextStyle(fontFamily: AppTheme.displayFont, fontSize: 26, letterSpacing: 2)),
+                  Text(s.channel?.safetyCode ?? '等待对方密钥…', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 26, letterSpacing: 2)),
                   const SizedBox(height: 8),
-                  Text('两部手机上显示的数字完全一致，说明没有被第三方窃听。', textAlign: TextAlign.center, style: TextStyle(color: v.inkSoft, fontSize: 12.5)),
+                  Text('两部手机上显示的数字完全一致，说明没有被第三方窃听。', textAlign: TextAlign.center, style: TextStyle(color: v.inkSoft, fontSize: 12)),
                 ]),
               ),
               const Spacer(),
-              GradientButton(label: '开始使用', onTap: widget.onContinue),
+              PrimaryButton(label: '开始使用', onTap: widget.onContinue),
             ]),
           ),
         ),

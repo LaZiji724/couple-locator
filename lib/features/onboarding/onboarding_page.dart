@@ -111,7 +111,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> with WidgetsBin
   Widget build(BuildContext context) {
     final v = context.vibes;
     return Scaffold(
-      body: FlowingBlobs(
+      body: PaperBackdrop(
         child: SafeArea(
           child: Column(children: [
             Align(alignment: Alignment.centerRight, child: TextButton(onPressed: _finish, child: Text('跳过', style: TextStyle(color: v.inkSoft)))),
@@ -130,12 +130,12 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> with WidgetsBin
                       const SizedBox(height: 36),
                       Text(s.title, textAlign: TextAlign.center, style: Theme.of(context).textTheme.headlineMedium),
                       const SizedBox(height: 12),
-                      Text(s.body, textAlign: TextAlign.center, style: TextStyle(color: v.inkSoft, fontSize: 15.5, height: 1.5)),
+                      Text(s.body, textAlign: TextAlign.center, style: TextStyle(color: v.inkSoft, fontSize: 15, height: 1.5)),
                       const SizedBox(height: 32),
                       if (done && !s.manual)
                         const _DoneChip()
                       else
-                        GradientButton(label: s.button, onTap: () => _act(s)),
+                        PrimaryButton(label: s.button, onTap: () => _act(s)),
                       const SizedBox(height: 12),
                       SoftButton(label: '去系统设置', icon: PhosphorIconsRegular.gearSix, onTap: PermissionService.openSystemSettings),
                     ]),
@@ -154,7 +154,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> with WidgetsBin
                       margin: const EdgeInsets.only(right: 6),
                       width: i == _i ? 28 : 8,
                       height: 8,
-                      decoration: BoxDecoration(gradient: i == _i ? AppColors.sunrise : null, color: i == _i ? null : v.inkSoft.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(9)),
+                      decoration: BoxDecoration(color: i == _i ? AppColors.accent : v.inkSoft.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(4)),
                     ),
                 ]),
                 const Spacer(),
@@ -172,18 +172,18 @@ class _DoneChip extends StatelessWidget {
   const _DoneChip();
   @override
   Widget build(BuildContext context) => Container(
-        height: 56,
-        padding: const EdgeInsets.symmetric(horizontal: 28),
-        decoration: BoxDecoration(color: AppColors.mint.withValues(alpha: 0.25), borderRadius: BorderRadius.circular(999)),
+        height: 52,
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        decoration: BoxDecoration(color: AppColors.mint.withValues(alpha: 0.16), borderRadius: BorderRadius.circular(AppRadii.small)),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(PhosphorIconsFill.checkCircle, color: Color(0xFF0F8A68)),
+          const Icon(PhosphorIconsFill.checkCircle, color: AppColors.mint),
           const SizedBox(width: 8),
-          Text('已开启', style: TextStyle(fontWeight: FontWeight.w800, color: context.vibes.ink)),
+          Text('已开启', style: TextStyle(fontWeight: FontWeight.w600, color: context.vibes.ink)),
         ]),
       );
 }
 
-/// 动画插图：渐变圆底 + 外扩雷达波 + 悬浮 emoji。
+/// 动画插图：中性圆底 + 外扩雷达波 + 悬浮 emoji。
 class _Illustration extends StatefulWidget {
   const _Illustration({required this.emoji, required this.active, required this.done});
   final String emoji;
@@ -219,13 +219,13 @@ class _IllustrationState extends State<_Illustration> with SingleTickerProviderS
                 return Container(
                   width: 120 + 120 * p,
                   height: 120 + 120 * p,
-                  decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: AppColors.coral.withValues(alpha: 0.35 * (1 - p)), width: 3)),
+                  decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: AppColors.accent.withValues(alpha: 0.3 * (1 - p)), width: 1)),
                 );
               }),
             Container(
               width: 130,
               height: 130,
-              decoration: BoxDecoration(shape: BoxShape.circle, gradient: AppColors.sunrise, boxShadow: AppShadows.soft(AppColors.coral, dark: context.vibes.isDark)),
+              decoration: BoxDecoration(shape: BoxShape.circle, color: context.vibes.surface, border: Border.all(color: context.vibes.hairline, width: 0.5)),
               alignment: Alignment.center,
               child: Transform.translate(
                 offset: Offset(0, reduced ? 0 : -6 * math.sin(t * 2 * math.pi)),

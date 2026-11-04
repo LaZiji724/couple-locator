@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/tokens.dart';
 import '../../core/widgets/vibe_widgets.dart';
 import '../../platform/permissions.dart';
 import 'onboarding_page.dart' show detectBrand;
@@ -86,7 +87,7 @@ class _RomGuidePageState extends State<RomGuidePage> {
     final rom = _roms.firstWhere((r) => r.id == _sel);
     return Scaffold(
       appBar: AppBar(title: const Text('后台保活设置指引')),
-      body: FlowingBlobs(
+      body: PaperBackdrop(
         child: SafeArea(
           child: ListView(padding: const EdgeInsets.all(20), children: [
             Text('国产安卓系统会主动杀后台。按下面的步骤设置一次，才能锁屏后继续共享位置。', style: TextStyle(color: v.inkSoft, height: 1.5)),
@@ -112,7 +113,7 @@ class _RomGuidePageState extends State<RomGuidePage> {
                   child: VibeCard(
                     padding: const EdgeInsets.all(14),
                     child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Container(width: 28, height: 28, alignment: Alignment.center, decoration: const BoxDecoration(shape: BoxShape.circle, gradient: LinearGradient(colors: [Color(0xFFFF6B8A), Color(0xFFFF9A6C)])), child: Text('${i + 1}', style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF3A1030)))),
+                      Container(width: 28, height: 28, alignment: Alignment.center, decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.accent), child: Text('${i + 1}', style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.onAccent))),
                       const SizedBox(width: 12),
                       Expanded(child: Text(s, style: const TextStyle(height: 1.45))),
                     ]),
@@ -120,7 +121,7 @@ class _RomGuidePageState extends State<RomGuidePage> {
                 ),
               ),
             const SizedBox(height: 10),
-            GradientButton(label: '打开系统设置', onTap: PermissionService.openSystemSettings),
+            PrimaryButton(label: '打开系统设置', onTap: PermissionService.openSystemSettings),
             const SizedBox(height: 10),
             SoftButton(label: '我设置好了', onTap: () => Navigator.pop(context)),
           ]),

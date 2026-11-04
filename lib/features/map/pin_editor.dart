@@ -9,6 +9,7 @@ import 'package:uuid/uuid.dart';
 import '../../app/providers.dart';
 import '../../core/geo/coord.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/tokens.dart';
 import '../../core/widgets/vibe_widgets.dart';
 import '../../domain/models/status.dart';
 
@@ -86,13 +87,13 @@ class _PinEditorState extends ConsumerState<_PinEditor> {
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: GlassPanel(
-        radius: 32,
+        radius: AppRadii.card,
         padding: EdgeInsets.fromLTRB(20, 16, 20, 20 + MediaQuery.of(context).padding.bottom),
         child: SingleChildScrollView(
           child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(widget.existing == null ? '添加共同标记' : '编辑标记', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 4),
-            Text('内容端到端加密，只有你们两人能看到。', style: TextStyle(color: v.inkSoft, fontSize: 12.5)),
+            Text('内容端到端加密，只有你们两人能看到。', style: TextStyle(color: v.inkSoft, fontSize: 12)),
             const SizedBox(height: 14),
             SizedBox(
               height: 52,
@@ -107,7 +108,7 @@ class _PinEditorState extends ConsumerState<_PinEditor> {
                     width: 52,
                     decoration: BoxDecoration(
                       color: _emoji == pinEmojis[i] ? _coral.withValues(alpha: 0.25) : v.surface.withValues(alpha: 0.6),
-                      borderRadius: BorderRadius.circular(18),
+                      borderRadius: BorderRadius.circular(AppRadii.small),
                       border: Border.all(color: _emoji == pinEmojis[i] ? _coral : Colors.transparent, width: 2),
                     ),
                     alignment: Alignment.center,
@@ -134,7 +135,7 @@ class _PinEditorState extends ConsumerState<_PinEditor> {
                 SoftButton(label: '删除', color: v.danger, icon: PhosphorIconsRegular.trash, onTap: _busy ? null : () => _save(delete: true)),
                 const SizedBox(width: 10),
               ],
-              Expanded(child: GradientButton(label: '保存', busy: _busy, onTap: _busy ? null : _save)),
+              Expanded(child: PrimaryButton(label: '保存', busy: _busy, onTap: _busy ? null : _save)),
             ]),
           ]),
         ),
@@ -144,4 +145,4 @@ class _PinEditorState extends ConsumerState<_PinEditor> {
 }
 
 
-const _coral = Color(0xFFFF6B8A);
+const _coral = AppColors.accent;

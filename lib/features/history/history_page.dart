@@ -194,7 +194,7 @@ class _HistoryPageState extends ConsumerState<HistoryPage> with SingleTickerProv
             position: _g(LocPoint(ts: st.start, lat: st.lat, lng: st.lng)),
             icon: _stayIcon[i]!,
             anchor: const Offset(0.5, 0.95),
-            infoWindow: InfoWindow(title: _stayNames[i] ?? '停留点', snippet: '${hm(st.start)}–${hm(st.end)} · ${durationText(st.duration)}'),
+            infoWindow: InfoWindow(title: _stayNames[i] ?? '停留点', snippet: '${hm(st.start)}–${hm(st.end)}，${durationText(st.duration)}'),
           ),
     };
     final media = MediaQuery.of(context);
@@ -220,7 +220,7 @@ class _HistoryPageState extends ConsumerState<HistoryPage> with SingleTickerProv
         left: 16,
         right: 16,
         child: GlassPanel(
-          radius: 26,
+          radius: AppRadii.card,
           padding: const EdgeInsets.all(10),
           child: Column(children: [
             Row(children: [
@@ -259,12 +259,12 @@ class _HistoryPageState extends ConsumerState<HistoryPage> with SingleTickerProv
                 _load();
               },
               calendarStyle: CalendarStyle(
-                selectedDecoration: BoxDecoration(gradient: pal.gradient, shape: BoxShape.circle),
-                selectedTextStyle: const TextStyle(color: AppColors.onGradient, fontWeight: FontWeight.w800),
+                selectedDecoration: const BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
+                selectedTextStyle: const TextStyle(color: AppColors.onAccent, fontWeight: FontWeight.w600),
                 todayDecoration: BoxDecoration(color: pal.start.withValues(alpha: 0.25), shape: BoxShape.circle),
                 todayTextStyle: TextStyle(color: v.ink, fontWeight: FontWeight.w700),
                 defaultTextStyle: TextStyle(color: v.ink),
-                weekendTextStyle: TextStyle(color: v.accentText),
+                weekendTextStyle: TextStyle(color: v.ink),
                 outsideTextStyle: TextStyle(color: v.inkSoft),
               ),
             ),
@@ -276,20 +276,20 @@ class _HistoryPageState extends ConsumerState<HistoryPage> with SingleTickerProv
         minChildSize: 0.16,
         maxChildSize: 0.75,
         builder: (context, scroll) => GlassPanel(
-          radius: 32,
+          radius: AppRadii.card,
           padding: EdgeInsets.zero,
           child: ListView(controller: scroll, padding: EdgeInsets.fromLTRB(18, 10, 18, 100 + media.padding.bottom), children: [
-            Center(child: Container(width: 40, height: 5, decoration: BoxDecoration(color: v.inkSoft.withValues(alpha: 0.4), borderRadius: BorderRadius.circular(9)))),
+            Center(child: Container(width: 40, height: 5, decoration: BoxDecoration(color: v.inkSoft.withValues(alpha: 0.4), borderRadius: BorderRadius.circular(4)))),
             const SizedBox(height: 12),
             if (_loading)
               const Padding(padding: EdgeInsets.all(24), child: Center(child: CircularProgressIndicator()))
             else if (_clean.length < 2)
-              const CuteEmpty(title: '这一天没有轨迹', subtitle: '换一天看看，或者等 TA 出门走一走', emoji: '🗓️')
+              const CuteEmpty(title: '这一天没有轨迹', subtitle: '换一天看看，或者等 TA 出门走一走', icon: PhosphorIconsRegular.calendarBlank)
             else ...[
               Row(children: [
                 IconButton.filled(
                   onPressed: _togglePlay,
-                  style: IconButton.styleFrom(backgroundColor: pal.start, foregroundColor: AppColors.onGradient),
+                  style: IconButton.styleFrom(backgroundColor: pal.start, foregroundColor: AppColors.onAccent),
                   icon: Icon(_playing ? PhosphorIconsFill.pause : PhosphorIconsFill.play),
                 ),
                 const SizedBox(width: 8),
@@ -299,7 +299,7 @@ class _HistoryPageState extends ConsumerState<HistoryPage> with SingleTickerProv
                     onChanged: (x) => setState(() => _progress = x),
                   ),
                 ),
-                SizedBox(width: 48, child: Text(rt == null ? '' : hm(rt), style: TextStyle(fontFamily: AppTheme.displayFont, color: v.ink))),
+                SizedBox(width: 48, child: Text(rt == null ? '' : hm(rt), style: TextStyle(fontWeight: FontWeight.w700, color: v.ink))),
               ]),
               Row(children: [
                 for (final sp in const [1, 4, 16])
@@ -313,7 +313,7 @@ class _HistoryPageState extends ConsumerState<HistoryPage> with SingleTickerProv
                     ),
                   ),
                 const Spacer(),
-                Text('${km.toStringAsFixed(1)} km · ${_raw.length} 个点 → ${_draw.length}', style: TextStyle(color: v.inkSoft, fontSize: 12)),
+                Text('${km.toStringAsFixed(1)} km，${_raw.length} 个点', style: TextStyle(color: v.inkSoft, fontSize: 12)),
               ]),
               const SectionTitle('停留点'),
               if (_stays.isEmpty)
@@ -356,7 +356,7 @@ class _StayTile extends StatelessWidget {
           SizedBox(
             width: 28,
             child: Column(children: [
-              Container(width: 14, height: 14, margin: const EdgeInsets.only(top: 6), decoration: BoxDecoration(color: color, shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 3))),
+              Container(width: 14, height: 14, margin: const EdgeInsets.only(top: 6), decoration: BoxDecoration(color: color, shape: BoxShape.circle, border: Border.all(color: v.surface, width: 2))),
               if (!isLast) Expanded(child: Container(width: 3, margin: const EdgeInsets.symmetric(vertical: 2), decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [color, color.withValues(alpha: 0.2)]), borderRadius: BorderRadius.circular(3)))),
             ]),
           ),
@@ -364,10 +364,10 @@ class _StayTile extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.only(bottom: 14),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15.5)),
+                Text(name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
                 const SizedBox(height: 4),
                 Row(children: [
-                  Text('${hm(st.start)} – ${hm(st.end)}', style: TextStyle(color: v.inkSoft, fontSize: 13)),
+                  Text('${hm(st.start)} – ${hm(st.end)}', style: TextStyle(color: v.inkSoft, fontSize: 12)),
                   const SizedBox(width: 8),
                   Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3), decoration: BoxDecoration(color: color.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(99)), child: Text('待了 ${durationText(st.duration)}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: v.ink))),
                 ]),

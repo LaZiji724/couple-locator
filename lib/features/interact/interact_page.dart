@@ -31,7 +31,7 @@ class _InteractPageState extends ConsumerState<InteractPage> with SingleTickerPr
   Widget build(BuildContext context) {
     final v = context.vibes;
     final s = ref.watch(syncProvider);
-    return FlowingBlobs(
+    return PaperBackdrop(
       child: SafeArea(
         bottom: false,
         child: Column(children: [
@@ -46,15 +46,15 @@ class _InteractPageState extends ConsumerState<InteractPage> with SingleTickerPr
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Container(
-              decoration: BoxDecoration(color: v.surface.withValues(alpha: 0.7), borderRadius: BorderRadius.circular(999)),
+              decoration: BoxDecoration(color: v.surfaceHigh, borderRadius: BorderRadius.circular(999)),
               child: TabBar(
                 controller: _tab,
                 dividerColor: Colors.transparent,
                 indicatorSize: TabBarIndicatorSize.tab,
-                indicator: BoxDecoration(gradient: AppColors.sunrise, borderRadius: BorderRadius.circular(999)),
-                labelColor: AppColors.onGradient,
+                indicator: BoxDecoration(color: AppColors.accent, borderRadius: BorderRadius.circular(999)),
+                labelColor: AppColors.onAccent,
                 unselectedLabelColor: v.inkSoft,
-                labelStyle: const TextStyle(fontWeight: FontWeight.w800),
+                labelStyle: const TextStyle(fontWeight: FontWeight.w600),
                 tabs: const [Tab(text: '消息'), Tab(text: '共同标记')],
               ),
             ),
@@ -74,11 +74,11 @@ class _InteractPageState extends ConsumerState<InteractPage> with SingleTickerPr
     final emoji = await showModalBottomSheet<String>(
       context: context,
       builder: (_) => GlassPanel(
-        radius: 32,
+        radius: AppRadii.card,
         padding: EdgeInsets.fromLTRB(20, 20, 20, 24 + MediaQuery.of(context).padding.bottom),
         child: Wrap(spacing: 14, runSpacing: 14, alignment: WrapAlignment.center, children: [
           for (final e in pokeEmojis)
-            Squish(onTap: () => Navigator.pop(context, e), child: Container(width: 66, height: 66, alignment: Alignment.center, decoration: BoxDecoration(color: context.vibes.surface.withValues(alpha: 0.7), borderRadius: BorderRadius.circular(22)), child: Text(e, style: const TextStyle(fontSize: 34)))),
+            Squish(onTap: () => Navigator.pop(context, e), child: Container(width: 66, height: 66, alignment: Alignment.center, decoration: BoxDecoration(color: context.vibes.surface.withValues(alpha: 0.7), borderRadius: BorderRadius.circular(AppRadii.small)), child: Text(e, style: const TextStyle(fontSize: 34)))),
         ]),
       ),
     );
@@ -98,7 +98,7 @@ class _EventList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final me = ref.read(backendProvider).userId;
-    if (s.events.isEmpty) return const CuteEmpty(title: '还没有消息', subtitle: '戳一戳 TA，或者点「我到了」报个平安吧', emoji: '💌');
+    if (s.events.isEmpty) return const CuteEmpty(title: '还没有消息', subtitle: '戳一戳 TA，或者点「我到了」报个平安吧', icon: PhosphorIconsRegular.envelopeSimple);
     final mp = PersonalPalette.byId(s.me?.themeId), pp = PersonalPalette.byId(s.partner?.themeId);
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 120),
@@ -126,7 +126,7 @@ class _EventList extends ConsumerWidget {
               constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.78),
               decoration: BoxDecoration(
                 gradient: pal.gradient.scale(0.35),
-                borderRadius: BorderRadius.only(topLeft: const Radius.circular(22), topRight: const Radius.circular(22), bottomLeft: Radius.circular(mine ? 22 : 6), bottomRight: Radius.circular(mine ? 6 : 22)),
+                borderRadius: BorderRadius.only(topLeft: const Radius.circular(16), topRight: const Radius.circular(16), bottomLeft: Radius.circular(mine ? 16 : 4), bottomRight: Radius.circular(mine ? 4 : 16)),
                 border: isSos ? Border.all(color: context.vibes.danger, width: 2) : null,
               ),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -136,7 +136,7 @@ class _EventList extends ConsumerWidget {
                   Flexible(child: Text(text, style: const TextStyle(fontWeight: FontWeight.w700))),
                 ]),
                 const SizedBox(height: 4),
-                Text('${e.at.month}/${e.at.day} ${hm(e.at)}', style: TextStyle(fontSize: 11.5, color: context.vibes.inkSoft)),
+                Text('${e.at.month}/${e.at.day} ${hm(e.at)}', style: TextStyle(fontSize: 12, color: context.vibes.inkSoft)),
                 if (e.kind == EventKind.arrived && !mine) ...[
                   const SizedBox(height: 8),
                   SoftButton(label: '收到', height: 36, icon: PhosphorIconsBold.check, onTap: () => ref.read(syncProvider.notifier).sendEvent(EventKind.ack, text: '收到')),
@@ -159,7 +159,7 @@ class _PinGrid extends ConsumerWidget {
     final v = context.vibes;
     return Stack(children: [
       if (s.pins.isEmpty)
-        const CuteEmpty(title: '还没有共同标记', subtitle: '在地图上长按任意位置，就能留下你们的小秘密', emoji: '📍')
+        const CuteEmpty(title: '还没有共同标记', subtitle: '在地图上长按任意位置，就能留下你们的小秘密', icon: PhosphorIconsRegular.mapPin)
       else
         GridView.builder(
           padding: const EdgeInsets.fromLTRB(20, 14, 20, 120),
@@ -170,7 +170,6 @@ class _PinGrid extends ConsumerWidget {
             return StaggerIn(
               index: i,
               child: VibeCard(
-                tint: AppColors.grape,
                 onTap: () => context.go('/'),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
@@ -179,9 +178,9 @@ class _PinGrid extends ConsumerWidget {
                     GestureDetector(onTap: () => showPinEditor(context, ref, existing: p), child: Icon(PhosphorIconsRegular.pencilSimple, color: v.inkSoft, size: 20)),
                   ]),
                   const SizedBox(height: 8),
-                  Text(p.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                  Text(p.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
                   const SizedBox(height: 4),
-                  Expanded(child: Text(p.note.isEmpty ? '没有备注' : p.note, maxLines: 3, overflow: TextOverflow.ellipsis, style: TextStyle(color: v.inkSoft, fontSize: 12.5))),
+                  Expanded(child: Text(p.note.isEmpty ? '没有备注' : p.note, maxLines: 3, overflow: TextOverflow.ellipsis, style: TextStyle(color: v.inkSoft, fontSize: 12))),
                 ]),
               ),
             );

@@ -8,6 +8,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../app/providers.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/tokens.dart';
 import '../../core/widgets/vibe_widgets.dart';
 import '../../domain/crypto/e2ee.dart';
 
@@ -131,7 +132,7 @@ class _KeyBackupPageState extends ConsumerState<KeyBackupPage> {
     final st = _strength;
     return Scaffold(
       appBar: AppBar(title: const Text('密钥备份')),
-      body: FlowingBlobs(
+      body: PaperBackdrop(
         child: SafeArea(
           child: ListView(padding: const EdgeInsets.all(20), children: [
             const Center(child: Text('🛡️', style: TextStyle(fontSize: 72))),
@@ -140,18 +141,18 @@ class _KeyBackupPageState extends ConsumerState<KeyBackupPage> {
             const SizedBox(height: 16),
             TextField(controller: _p1, obscureText: true, onChanged: (_) => setState(() {}), decoration: const InputDecoration(hintText: '备份口令（至少 8 位）')),
             const SizedBox(height: 8),
-            Row(children: [for (var i = 0; i < 4; i++) Expanded(child: Container(height: 6, margin: const EdgeInsets.symmetric(horizontal: 3), decoration: BoxDecoration(color: i < st ? [v.danger, Colors.orange, Colors.amber, const Color(0xFF2BBF94)][st - 1] : v.inkSoft.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(9))))]),
+            Row(children: [for (var i = 0; i < 4; i++) Expanded(child: Container(height: 6, margin: const EdgeInsets.symmetric(horizontal: 3), decoration: BoxDecoration(color: i < st ? [v.danger, Colors.orange, Colors.amber, const Color(0xFF2BBF94)][st - 1] : v.inkSoft.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(4))))]),
             const SizedBox(height: 12),
             TextField(controller: _p2, obscureText: true, decoration: const InputDecoration(hintText: '再输入一次')),
             const SizedBox(height: 18),
-            GradientButton(label: '备份到云端', icon: PhosphorIconsFill.cloudArrowUp, busy: _busy, onTap: _busy ? null : _cloud),
+            PrimaryButton(label: '备份到云端', icon: PhosphorIconsFill.cloudArrowUp, busy: _busy, onTap: _busy ? null : _cloud),
             const SizedBox(height: 10),
             SoftButton(label: '导出为二维码', icon: PhosphorIconsRegular.qrCode, onTap: _busy ? null : _export),
             if (_qr != null) ...[
               const SizedBox(height: 14),
-              Center(child: Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)), child: QrImageView(data: _qr!, size: 240))),
+              Center(child: Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(AppRadii.small)), child: QrImageView(data: _qr!, size: 240))),
               const SizedBox(height: 6),
-              Text('二维码内是口令加密后的密文，请截图或拍照妥善保存，不要发给别人。', textAlign: TextAlign.center, style: TextStyle(color: v.inkSoft, fontSize: 12.5)),
+              Text('二维码内是口令加密后的密文，请截图或拍照妥善保存，不要发给别人。', textAlign: TextAlign.center, style: TextStyle(color: v.inkSoft, fontSize: 12)),
             ],
             if (_msg != null) ...[const SizedBox(height: 14), Text(_msg!, style: TextStyle(color: _msg!.contains('✅') ? const Color(0xFF0F8A68) : v.danger, fontWeight: FontWeight.w700))],
             const SectionTitle('换手机？恢复密钥'),

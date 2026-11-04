@@ -3,14 +3,16 @@ import 'package:flutter/material.dart';
 
 import 'tokens.dart';
 
-/// 业务专用的主题扩展：渐变、毛玻璃、语义色。
+/// 业务专用的主题扩展：表面层级、毛玻璃、语义色。
 @immutable
 class Vibes extends ThemeExtension<Vibes> {
   const Vibes({
     required this.bg,
     required this.surface,
+    required this.surfaceHigh,
     required this.glass,
     required this.glassBorder,
+    required this.hairline,
     required this.ink,
     required this.inkSoft,
     required this.accentText,
@@ -20,21 +22,23 @@ class Vibes extends ThemeExtension<Vibes> {
 
   final Color bg;
   final Color surface;
+  final Color surfaceHigh;
   final Color glass;
   final Color glassBorder;
+  final Color hairline;
   final Color ink;
   final Color inkSoft;
   final Color accentText;
   final Color danger;
   final bool isDark;
 
-  LinearGradient get sunrise => AppColors.sunrise;
-
   static const light = Vibes(
     bg: AppColors.creamBg,
-    surface: Colors.white,
-    glass: Color(0xB8FFFFFF),
-    glassBorder: Color(0x66FFFFFF),
+    surface: Color(0xFFFFFDFA),
+    surfaceHigh: AppColors.surfaceHighLight,
+    glass: Color(0xD6FFFDFA),
+    glassBorder: AppColors.hairlineLight,
+    hairline: AppColors.hairlineLight,
     ink: AppColors.inkLight,
     inkSoft: AppColors.inkSoftLight,
     accentText: AppColors.accentTextLight,
@@ -45,8 +49,10 @@ class Vibes extends ThemeExtension<Vibes> {
   static const dark = Vibes(
     bg: AppColors.nightBg,
     surface: AppColors.nightSurface,
-    glass: Color(0xAD2A2340),
-    glassBorder: Color(0x33FFFFFF),
+    surfaceHigh: AppColors.nightSurfaceHigh,
+    glass: Color(0xD6221E1C),
+    glassBorder: AppColors.hairlineDark,
+    hairline: AppColors.hairlineDark,
     ink: AppColors.inkDark,
     inkSoft: AppColors.inkSoftDark,
     accentText: AppColors.accentTextDark,
@@ -63,8 +69,10 @@ class Vibes extends ThemeExtension<Vibes> {
     return Vibes(
       bg: Color.lerp(bg, other.bg, t)!,
       surface: Color.lerp(surface, other.surface, t)!,
+      surfaceHigh: Color.lerp(surfaceHigh, other.surfaceHigh, t)!,
       glass: Color.lerp(glass, other.glass, t)!,
       glassBorder: Color.lerp(glassBorder, other.glassBorder, t)!,
+      hairline: Color.lerp(hairline, other.hairline, t)!,
       ink: Color.lerp(ink, other.ink, t)!,
       inkSoft: Color.lerp(inkSoft, other.inkSoft, t)!,
       accentText: Color.lerp(accentText, other.accentText, t)!,
@@ -79,36 +87,31 @@ extension VibesX on BuildContext {
 }
 
 abstract final class AppTheme {
-  static const displayFont = 'ZCOOLKuaiLe';
-
   static ThemeData light() => _build(Vibes.light, Brightness.light);
   static ThemeData dark() => _build(Vibes.dark, Brightness.dark);
 
   static ThemeData _build(Vibes v, Brightness b) {
     final scheme = ColorScheme(
       brightness: b,
-      primary: AppColors.coral,
-      onPrimary: AppColors.onGradient,
-      secondary: AppColors.peach,
-      onSecondary: AppColors.onGradient,
+      primary: AppColors.accent,
+      onPrimary: AppColors.onAccent,
+      secondary: v.inkSoft,
+      onSecondary: v.bg,
       tertiary: AppColors.mint,
-      onTertiary: AppColors.inkLight,
+      onTertiary: Colors.white,
       error: v.danger,
       onError: Colors.white,
       surface: v.surface,
       onSurface: v.ink,
       onSurfaceVariant: v.inkSoft,
-      surfaceContainerHighest:
-          v.isDark ? AppColors.nightSurfaceHigh : const Color(0xFFFFEFE6),
-      outline: v.inkSoft.withValues(alpha: 0.4),
+      surfaceContainerHighest: v.surfaceHigh,
+      outline: v.hairline,
+      outlineVariant: v.hairline,
     );
 
-    TextStyle display(double size) => TextStyle(
-          fontFamily: displayFont,
-          fontSize: size,
-          color: v.ink,
-          height: 1.2,
-        );
+    // 字号只用 4 档：展示 28 / 标题 20 / 正文 15 / 说明 12。
+    TextStyle t(double size, FontWeight w, {double height = 1.35}) =>
+        TextStyle(fontSize: size, fontWeight: w, color: v.ink, height: height);
 
     final base = ThemeData(
       useMaterial3: true,
@@ -116,17 +119,26 @@ abstract final class AppTheme {
       brightness: b,
       scaffoldBackgroundColor: v.bg,
       extensions: [v],
-      splashFactory: InkSparkle.splashFactory,
+      splashFactory: InkRipple.splashFactory,
+      dividerColor: v.hairline,
     );
 
     return base.copyWith(
       textTheme: base.textTheme
           .apply(bodyColor: v.ink, displayColor: v.ink)
           .copyWith(
-            displaySmall: display(34),
-            headlineMedium: display(28),
-            headlineSmall: display(24),
-            titleLarge: display(21),
+            displaySmall: t(28, FontWeight.w700, height: 1.2),
+            headlineMedium: t(28, FontWeight.w700, height: 1.2),
+            headlineSmall: t(20, FontWeight.w700, height: 1.25),
+            titleLarge: t(20, FontWeight.w700, height: 1.25),
+            titleMedium: t(15, FontWeight.w600),
+            titleSmall: t(15, FontWeight.w600),
+            bodyLarge: t(15, FontWeight.w400, height: 1.5),
+            bodyMedium: t(15, FontWeight.w400, height: 1.5),
+            bodySmall: t(12, FontWeight.w400),
+            labelLarge: t(15, FontWeight.w600),
+            labelMedium: t(12, FontWeight.w500),
+            labelSmall: t(12, FontWeight.w500),
           ),
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
@@ -134,7 +146,7 @@ abstract final class AppTheme {
         scrolledUnderElevation: 0,
         centerTitle: true,
         foregroundColor: v.ink,
-        titleTextStyle: display(20),
+        titleTextStyle: t(17, FontWeight.w700),
       ),
       cardTheme: CardThemeData(
         color: v.surface,
@@ -142,20 +154,25 @@ abstract final class AppTheme {
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadii.card),
+          side: BorderSide(color: v.hairline, width: 0.5),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: v.isDark ? AppColors.nightSurfaceHigh : Colors.white,
+        fillColor: v.surfaceHigh,
         contentPadding:
-            const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadii.pill),
+          borderRadius: BorderRadius.circular(AppRadii.small),
           borderSide: BorderSide.none,
         ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppRadii.small),
+          borderSide: BorderSide(color: v.hairline, width: 0.5),
+        ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadii.pill),
-          borderSide: const BorderSide(color: AppColors.coral, width: 2),
+          borderRadius: BorderRadius.circular(AppRadii.small),
+          borderSide: const BorderSide(color: AppColors.accent, width: 1.5),
         ),
         hintStyle: TextStyle(color: v.inkSoft),
         labelStyle: TextStyle(color: v.inkSoft),
@@ -165,24 +182,27 @@ abstract final class AppTheme {
           shape: WidgetStateProperty.all(const StadiumBorder()),
           backgroundColor: WidgetStateProperty.resolveWith((s) =>
               s.contains(WidgetState.selected)
-                  ? AppColors.coral.withValues(alpha: v.isDark ? 0.35 : 0.18)
+                  ? AppColors.accent.withValues(alpha: v.isDark ? 0.28 : 0.12)
                   : Colors.transparent),
-          foregroundColor: WidgetStateProperty.all(v.ink),
-          side: WidgetStateProperty.all(
-              BorderSide(color: v.inkSoft.withValues(alpha: 0.3))),
+          foregroundColor: WidgetStateProperty.resolveWith((s) =>
+              s.contains(WidgetState.selected) ? v.accentText : v.ink),
+          side: WidgetStateProperty.all(BorderSide(color: v.hairline, width: 0.5)),
         ),
       ),
       sliderTheme: SliderThemeData(
-        activeTrackColor: AppColors.coral,
-        inactiveTrackColor: AppColors.coral.withValues(alpha: 0.2),
-        thumbColor: AppColors.peach,
-        overlayColor: AppColors.coral.withValues(alpha: 0.12),
-        trackHeight: 6,
+        activeTrackColor: AppColors.accent,
+        inactiveTrackColor: AppColors.accent.withValues(alpha: 0.18),
+        thumbColor: AppColors.accent,
+        overlayColor: AppColors.accent.withValues(alpha: 0.12),
+        trackHeight: 4,
       ),
       switchTheme: SwitchThemeData(
         trackColor: WidgetStateProperty.resolveWith((s) =>
-            s.contains(WidgetState.selected) ? AppColors.mint : null),
-        thumbColor: WidgetStateProperty.all(Colors.white),
+            s.contains(WidgetState.selected) ? AppColors.accent : v.surfaceHigh),
+        trackOutlineColor: WidgetStateProperty.resolveWith((s) =>
+            s.contains(WidgetState.selected) ? Colors.transparent : v.hairline),
+        thumbColor: WidgetStateProperty.resolveWith((s) =>
+            s.contains(WidgetState.selected) ? Colors.white : v.inkSoft),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: Colors.transparent,
@@ -197,32 +217,33 @@ abstract final class AppTheme {
         behavior: SnackBarBehavior.floating,
         backgroundColor: v.isDark ? AppColors.nightSurfaceHigh : AppColors.inkLight,
         contentTextStyle: const TextStyle(color: Colors.white),
-        shape: const StadiumBorder(),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadii.small)),
       ),
       pageTransitionsTheme: const PageTransitionsTheme(builders: {
-        TargetPlatform.android: _SpringUpTransitionsBuilder(),
+        TargetPlatform.android: _SlideUpTransitionsBuilder(),
         TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
       }),
     );
   }
 }
 
-/// 淡入 + 上移 24px 的弹簧页面过渡。
-class _SpringUpTransitionsBuilder extends PageTransitionsBuilder {
-  const _SpringUpTransitionsBuilder();
+/// 淡入 + 上移 16px，ease-out 250ms。
+class _SlideUpTransitionsBuilder extends PageTransitionsBuilder {
+  const _SlideUpTransitionsBuilder();
   @override
   Widget buildTransitions<T>(PageRoute<T> route, BuildContext context,
       Animation<double> animation, Animation<double> secondary, Widget child) {
     final curved = CurvedAnimation(
         parent: animation,
-        curve: Curves.easeOutBack,
+        curve: Curves.easeOutCubic,
         reverseCurve: Curves.easeInCubic);
     return FadeTransition(
-      opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
+      opacity: curved,
       child: AnimatedBuilder(
         animation: curved,
         builder: (_, c) => Transform.translate(
-            offset: Offset(0, 24 * (1 - curved.value)), child: c),
+            offset: Offset(0, 16 * (1 - curved.value)), child: c),
         child: child,
       ),
     );

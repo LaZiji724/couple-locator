@@ -93,7 +93,7 @@ class _SetupRequired extends StatelessWidget {
   Widget build(BuildContext context) {
     final v = context.vibes;
     return Scaffold(
-      body: FlowingBlobs(
+      body: PaperBackdrop(
         child: SafeArea(
           child: Center(
             child: Padding(
