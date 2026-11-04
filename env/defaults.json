@@ -1,4 +1,6 @@
 {
   "AMAP_ANDROID_KEY": "ff9d10298889a5becc95723b92987682",
-  "AMAP_IOS_KEY": "7d841cddfeb2b5e918e3c711d1ebf666"
+  "AMAP_IOS_KEY": "7d841cddfeb2b5e918e3c711d1ebf666",
+  "SUPABASE_URL": "https://lajpyaigqqtnqguwcbhf.supabase.co",
+  "SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhanB5YWlncXF0bnFndXdjYmhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM3NTY2ODEsImV4cCI6MjEwOTMzMjY4MX0.VWNnWOGt-pWXkyWKeA-8yZjwNaw3J835bbmIVqqiAqg"
 }
