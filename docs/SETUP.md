@@ -6,7 +6,9 @@
    或使用 CLI：`supabase link --project-ref <ref> && supabase db push`。
    会创建：profiles / couples / invites / locations / presence / status / events / pins / diag_logs，全部开启 RLS，
    配对/解除/清除/保留期/心跳走 `security definer` RPC，`pg_cron` 每天 03:15 清理过期 locations 与 events（取双方保留期较短者）。
-4. **认证设置**：Authentication → Providers → Email：开启。个人使用建议**关闭 “Confirm email”**，否则注册后需先点邮件链接。
+4. **认证设置**（App 使用「用户名 + 密码」，不收集真实邮箱）：Authentication → Providers → Email：保持开启，并**必须关闭 “Confirm email”**（否则注册后无法登录，因为内部邮箱收不到邮件）。
+   App 内部把用户名（3–20 位小写字母/数字/下划线，不区分大小写）映射成 `用户名@couple-locator.app` 交给 Supabase Auth；域名可用 `--dart-define=AUTH_EMAIL_DOMAIN=xxx` 或 env 文件覆盖。
+   注意：没有真实邮箱 = **忘记密码无法找回**；请提醒双方牢记密码，并在「设置 → 密钥备份」备份加密密钥。若日后想允许改密，可再接入绑定邮箱流程。
 5. **Realtime**：迁移已把 locations/presence/status/events/pins/couples 加入 `supabase_realtime` publication；确认 Database → Replication 中可见。
 6. **取密钥**：Project Settings → API：
    - `Project URL` → `SUPABASE_URL`

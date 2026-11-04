@@ -5,8 +5,8 @@ abstract class Backend {
   // ── 认证 ──
   String? get userId;
   Stream<bool> get authChanges; // true=已登录
-  Future<void> signUp(String email, String password);
-  Future<void> signIn(String email, String password);
+  Future<void> signUp(String username, String password);
+  Future<void> signIn(String username, String password);
   Future<void> signOut();
 
   // ── 资料 ──

@@ -5,6 +5,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../app/providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/tokens.dart';
+import '../../core/username.dart';
 import '../../core/widgets/vibe_widgets.dart';
 
 class AuthPage extends ConsumerStatefulWidget {
@@ -14,7 +15,7 @@ class AuthPage extends ConsumerStatefulWidget {
 }
 
 class _AuthPageState extends ConsumerState<AuthPage> {
-  final _email = TextEditingController();
+  final _user = TextEditingController();
   final _pwd = TextEditingController();
   bool _signup = false;
   bool _busy = false;
@@ -23,18 +24,18 @@ class _AuthPageState extends ConsumerState<AuthPage> {
 
   String _friendly(Object e) {
     final m = e.toString();
-    if (m.contains('Invalid login')) return '邮箱或密码不正确';
-    if (m.contains('already registered')) return '这个邮箱已经注册过了，直接登录吧';
+    if (m.contains('Invalid login')) return '用户名或密码不正确';
+    if (m.contains('already registered')) return '这个用户名已经被占用了，换一个或直接登录';
     if (m.contains('Password should')) return '密码至少 6 位';
-    if (m.contains('Email not confirmed')) return '请先去邮箱点击确认链接（或在 Supabase 后台关闭邮箱确认）';
+    if (m.contains('Email not confirmed')) return '后台还开着邮箱确认：请在 Supabase 后台关闭 Confirm email（见 docs/SETUP.md）';
     if (m.contains('SocketException') || m.contains('Failed host lookup')) return '网络不通，请检查网络（Supabase 在国内可能需要稳定的网络环境）';
     return '出错了：$m';
   }
 
   Future<void> _submit() async {
-    final e = _email.text.trim(), p = _pwd.text;
-    if (!e.contains('@') || p.length < 6) {
-      setState(() => _err = '请输入有效邮箱和至少 6 位密码');
+    final e = _user.text.trim(), p = _pwd.text;
+    if (!Username.isValid(e) || p.length < 6) {
+      setState(() => _err = '用户名为 3–20 位字母、数字或下划线；密码至少 6 位');
       return;
     }
     setState(() {
@@ -87,7 +88,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                         onSelectionChanged: (s) => setState(() => _signup = s.first),
                       ),
                       const SizedBox(height: 18),
-                      TextField(controller: _email, keyboardType: TextInputType.emailAddress, autofillHints: const [AutofillHints.email], decoration: const InputDecoration(hintText: '邮箱', prefixIcon: Icon(PhosphorIconsRegular.envelopeSimple))),
+                      TextField(controller: _user, keyboardType: TextInputType.visiblePassword, autocorrect: false, enableSuggestions: false, autofillHints: const [AutofillHints.username], decoration: const InputDecoration(hintText: '用户名（字母/数字/下划线）', prefixIcon: Icon(PhosphorIconsRegular.user))),
                       const SizedBox(height: 12),
                       TextField(
                         controller: _pwd,
@@ -100,6 +101,10 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                           suffixIcon: IconButton(icon: Icon(_obscure ? PhosphorIconsRegular.eye : PhosphorIconsRegular.eyeSlash), onPressed: () => setState(() => _obscure = !_obscure)),
                         ),
                       ),
+                      if (_signup) ...[
+                        const SizedBox(height: 10),
+                        Text('无需邮箱。但这也意味着忘记密码无法找回，请牢记并在「设置」里备份密钥。', style: TextStyle(color: v.inkSoft, fontSize: 12.5)),
+                      ],
                       if (_err != null) ...[
                         const SizedBox(height: 12),
                         Text(_err!, style: TextStyle(color: v.danger, fontWeight: FontWeight.w600)),

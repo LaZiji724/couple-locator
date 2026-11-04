@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/log.dart';
+import '../../core/username.dart';
 import 'backend.dart';
 
 class SupabaseBackend implements Backend {
@@ -16,17 +17,18 @@ class SupabaseBackend implements Backend {
   Stream<bool> get authChanges => _c.auth.onAuthStateChange.map((e) => e.session != null);
 
   @override
-  Future<void> signUp(String email, String password) async {
+  Future<void> signUp(String username, String password) async {
+    final email = Username.toAuthEmail(username);
     final r = await _c.auth.signUp(email: email, password: password);
     if (r.session == null) {
-      // 若项目开启了邮箱确认，则需要先确认；这里尝试直接登录，失败会抛出友好提示
-      await signIn(email, password);
+      // 若项目误开了邮箱确认，则直接登录会失败并提示（见 docs/SETUP.md）
+      await signIn(username, password);
     }
   }
 
   @override
-  Future<void> signIn(String email, String password) async {
-    await _c.auth.signInWithPassword(email: email, password: password);
+  Future<void> signIn(String username, String password) async {
+    await _c.auth.signInWithPassword(email: Username.toAuthEmail(username), password: password);
   }
 
   @override
