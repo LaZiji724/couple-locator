@@ -79,7 +79,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        variant: [noext, widgets]
+        variant: [noext]
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
@@ -102,12 +102,7 @@ jobs:
           json.dump(d, open('env/ci.json','w'))
           PY
       - name: 构建未签名 IPA（${{ matrix.variant }}）
-        run: |
-          if [ "${{ matrix.variant }}" = "widgets" ]; then
-            bash scripts/build_ipa.sh --with-widgets env/ci.json
-          else
-            bash scripts/build_ipa.sh env/ci.json
-          fi
+        run: bash scripts/build_ipa.sh env/ci.json
       - uses: actions/upload-artifact@v4
         with:
           name: ios-ipa-${{ matrix.variant }}
@@ -137,21 +132,17 @@ jobs:
           mkdir -p rel
           cp artifacts/android-apk/app-release.apk rel/CoupleLocator-android.apk
           cp artifacts/ios-ipa-noext/CoupleLocator-noext.ipa rel/CoupleLocator-ios-noext.ipa
-          cp artifacts/ios-ipa-widgets/CoupleLocator-widgets.ipa rel/CoupleLocator-ios-widgets.ipa
           # 校验：产物里必须真的带有内置的 Supabase 地址与高德 Key，否则不发布
           URL_HOST="$(python3 -c "import json;print(json.load(open('env/defaults.json'))['SUPABASE_URL'].split('//')[1])")"
           AMAP_A="$(python3 -c "import json;print(json.load(open('env/defaults.json'))['AMAP_ANDROID_KEY'])")"
           AMAP_I="$(python3 -c "import json;print(json.load(open('env/defaults.json'))['AMAP_IOS_KEY'])")"
-          mkdir -p chk/apk chk/noext chk/widgets
+          mkdir -p chk/apk chk/noext
           unzip -q -o rel/CoupleLocator-android.apk -d chk/apk
           unzip -q -o rel/CoupleLocator-ios-noext.ipa -d chk/noext
-          unzip -q -o rel/CoupleLocator-ios-widgets.ipa -d chk/widgets
           grep -rqa "$URL_HOST" chk/apk/lib || { echo "APK 缺少 Supabase 地址"; exit 1; }
           grep -rqa "$AMAP_A" chk/apk || { echo "APK 缺少高德 Android Key"; exit 1; }
-          for v in noext widgets; do
-            grep -rqa "$URL_HOST" chk/$v/Payload/Runner.app/Frameworks/App.framework || { echo "IPA($v) 缺少 Supabase 地址"; exit 1; }
-            grep -rqa "$AMAP_I" chk/$v/Payload/Runner.app/Frameworks/App.framework || { echo "IPA($v) 缺少高德 iOS Key"; exit 1; }
-          done
+          grep -rqa "$URL_HOST" chk/noext/Payload/Runner.app/Frameworks/App.framework || { echo "IPA 缺少 Supabase 地址"; exit 1; }
+          grep -rqa "$AMAP_I" chk/noext/Payload/Runner.app/Frameworks/App.framework || { echo "IPA 缺少高德 iOS Key"; exit 1; }
           echo "内置配置校验通过"
           SUBJECT="$(printf '%s' "$MSG" | head -n1)"
           cat > notes.md <<EOF
@@ -160,7 +151,7 @@ jobs:
 
           ## 怎么装
           - **Android**：下载 \`CoupleLocator-android.apk\` 直接安装（首次需允许“安装未知应用”）。
-          - **iOS**：下载 IPA 后用全能签 / AltStore / Sideloadly 重签安装。先试 \`CoupleLocator-ios-noext.ipa\`（不含小组件，最稳）；\`CoupleLocator-ios-widgets.ipa\` 含小组件和实时活动，重签后可能受限。
+          - **iOS**：下载 \`CoupleLocator-ios-noext.ipa\` 后用全能签 / AltStore / Sideloadly 重签安装。
           - 未签名的 IPA 不能直接装；Android APK 用仓库内固定密钥签名，覆盖安装升级不会冲突。
 
           提交：${GITHUB_SHA::7}
