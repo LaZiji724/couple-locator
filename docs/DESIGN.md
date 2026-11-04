@@ -29,7 +29,7 @@
 - 毛玻璃：`BackdropFilter(blur 18)` + `glass` 底 + 0.5px 描边，用于叠在地图上的面板。
 - 主按钮 `PrimaryButton`：纯色强调色，顶部提亮 + 1px 深一档描边 + 两层投影，按下缩放 0.97；每屏只放一个。次级按钮 `SoftButton`：`surfaceHigh` 底 + 细边框 + 墨色文字。
 - 图标：Phosphor（Regular 线性为主，选中态用 Fill）。
-- 字体：系统字体（iOS PingFang，Android Noto Sans CJK）。字号只用 4 档：展示 28 / 标题 20 / 正文 15 / 说明 12，层级靠字重（400/600/700）、颜色与间距拉开。
+- 字体：系统字体（iOS PingFang，Android Noto Sans CJK）。字号只用 4 档：展示 24 / 标题 18 / 正文 14 / 说明 12，层级靠字重（400/600/700）、颜色与间距拉开。
 - 间距落在 4px 网格上，以 8 为主。
 - 空状态用缩小版真实界面（占位条 + 图标），不用插画。
 

@@ -394,7 +394,7 @@ class _DistanceLabel extends StatelessWidget {
     return Row(mainAxisSize: MainAxisSize.min, children: [
       Icon(PhosphorIconsFill.heartStraight, size: 14, color: context.vibes.accentText),
       const SizedBox(width: 6),
-      RollingNumber(value: km ? meters / 1000 : meters, decimals: km ? 2 : 0, suffix: km ? ' km' : ' m', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: context.vibes.ink)),
+      RollingNumber(value: km ? meters / 1000 : meters, decimals: km ? 2 : 0, suffix: km ? ' km' : ' m', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: context.vibes.ink)),
     ]);
   }
 }

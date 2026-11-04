@@ -89,7 +89,7 @@ class _StatsPageState extends ConsumerState<StatsPage> {
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Row(children: [Icon(PhosphorIconsFill.heart, color: v.accentText, size: 20), const SizedBox(width: 6), Text('在一起', style: TextStyle(color: v.inkSoft, fontWeight: FontWeight.w700))]),
                       const SizedBox(height: 8),
-                      RollingNumber(value: r.together.inMinutes / 60, decimals: 1, suffix: ' 小时', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 28, color: v.ink)),
+                      RollingNumber(value: r.together.inMinutes / 60, decimals: 1, suffix: ' 小时', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 24, color: v.ink)),
                       Text('两人距离小于 100 米', style: TextStyle(color: v.inkSoft, fontSize: 12)),
                     ]),
                   ),
@@ -100,7 +100,7 @@ class _StatsPageState extends ConsumerState<StatsPage> {
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Row(children: [Icon(PhosphorIconsFill.mapPin, color: v.accentText, size: 20), const SizedBox(width: 6), Text('停留最久', style: TextStyle(color: v.inkSoft, fontWeight: FontWeight.w700))]),
                       const SizedBox(height: 8),
-                      Text(_stayName ?? '暂无', maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20, color: v.ink)),
+                      Text(_stayName ?? '暂无', maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18, color: v.ink)),
                       if ((r.longestStayMine ?? r.longestStayPartner) != null) Text(durationText((r.longestStayMine ?? r.longestStayPartner)!.duration), style: TextStyle(color: v.inkSoft, fontSize: 12)),
                     ]),
                   ),
@@ -182,7 +182,7 @@ class _BigCard extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [Icon(icon, color: gradient.colors.first, size: 20), const SizedBox(width: 8), Text(title, style: TextStyle(color: v.inkSoft, fontWeight: FontWeight.w600))]),
         const SizedBox(height: 8),
-        RollingNumber(value: value, decimals: 1, suffix: suffix, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 28, color: v.ink)),
+        RollingNumber(value: value, decimals: 1, suffix: suffix, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 24, color: v.ink)),
       ]),
     );
   }

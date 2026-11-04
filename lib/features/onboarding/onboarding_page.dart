@@ -130,7 +130,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> with WidgetsBin
                       const SizedBox(height: 36),
                       Text(s.title, textAlign: TextAlign.center, style: Theme.of(context).textTheme.headlineMedium),
                       const SizedBox(height: 12),
-                      Text(s.body, textAlign: TextAlign.center, style: TextStyle(color: v.inkSoft, fontSize: 15, height: 1.5)),
+                      Text(s.body, textAlign: TextAlign.center, style: TextStyle(color: v.inkSoft, fontSize: 14, height: 1.5)),
                       const SizedBox(height: 32),
                       if (done && !s.manual)
                         const _DoneChip()

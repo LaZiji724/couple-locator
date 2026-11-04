@@ -130,7 +130,7 @@ class AvatarMarkerPainter {
     c.drawPath(tri, ui.Paint()..color = AppColors.accent);
     c.drawCircle(const Offset(w / 2, 22), 19, ui.Paint()..color = AppColors.accent);
     c.drawCircle(const Offset(w / 2, 22), 16, ui.Paint()..color = const Color(0xFFFFFFFF));
-    final tp = TextPainter(text: TextSpan(text: emoji, style: const TextStyle(fontSize: 20)), textDirection: TextDirection.ltr)..layout();
+    final tp = TextPainter(text: TextSpan(text: emoji, style: const TextStyle(fontSize: 18)), textDirection: TextDirection.ltr)..layout();
     tp.paint(c, Offset(w / 2 - tp.width / 2, 22 - tp.height / 2));
     final img = await rec.endRecording().toImage((w * scale).round(), (h * scale).round());
     final data = await img.toByteData(format: ui.ImageByteFormat.png);

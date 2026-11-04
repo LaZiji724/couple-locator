@@ -178,7 +178,7 @@ class _PinGrid extends ConsumerWidget {
                     GestureDetector(onTap: () => showPinEditor(context, ref, existing: p), child: Icon(PhosphorIconsRegular.pencilSimple, color: v.inkSoft, size: 20)),
                   ]),
                   const SizedBox(height: 8),
-                  Text(p.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                  Text(p.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                   const SizedBox(height: 4),
                   Expanded(child: Text(p.note.isEmpty ? '没有备注' : p.note, maxLines: 3, overflow: TextOverflow.ellipsis, style: TextStyle(color: v.inkSoft, fontSize: 12))),
                 ]),
