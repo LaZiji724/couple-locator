@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../../core/log.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -35,9 +36,16 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // 已配对 + 有定位权限 → 启动后台上报
-      if (await PermissionService.hasLocation()) {
-        await TrackerService.instance.start();
-        IosLocationChannel.startSignificant();
+      try {
+        // 稍等一帧，让首页和地图先渲染完，再启动后台服务，避免和地图初始化抢资源
+        await Future<void>.delayed(const Duration(milliseconds: 800));
+        if (!mounted) return;
+        if (await PermissionService.hasLocation()) {
+          await TrackerService.instance.start();
+          IosLocationChannel.startSignificant();
+        }
+      } catch (e) {
+        AppLog.e('shell', e);
       }
     });
     _lost = Timer.periodic(const Duration(minutes: 1), (_) => _checkLost());

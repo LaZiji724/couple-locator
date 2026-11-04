@@ -24,9 +24,15 @@ class _TrackerHandler extends TaskHandler {
   @override
   Future<void> onStart(DateTime timestamp, TaskStarter starter) async {
     WidgetsFlutterBinding.ensureInitialized();
-    _core = await buildTrackerCore();
-    await _core?.start();
     try {
+      _core = await buildTrackerCore();
+      await _core?.start();
+    } catch (e, st) {
+      AppLog.e('service', 'onStart 失败：$e\n$st');
+    }
+    try {
+      // 没有「身体活动」权限时订阅会在原生侧抛 SecurityException，所以先检查
+      if (await FlutterActivityRecognition.instance.checkPermission() != ActivityPermission.GRANTED) return;
       _act = FlutterActivityRecognition.instance.activityStream.listen((a) {
         _core?.setActivity(a.type.name.toUpperCase().replaceAll('IN_VEHICLE', 'IN_VEHICLE'));
       });
@@ -101,6 +107,14 @@ class TrackerService {
   Future<bool> get running async => Platform.isAndroid ? FlutterForegroundTask.isRunningService : _iosCore != null;
 
   Future<void> start() async {
+    try {
+      await _start();
+    } catch (e, st) {
+      AppLog.e('service', '启动失败：$e\n$st');
+    }
+  }
+
+  Future<void> _start() async {
     final s = await SettingsStore.open();
     await s.setTracking(true);
     if (Platform.isAndroid) {
