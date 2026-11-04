@@ -48,14 +48,21 @@ android {
                 storePassword = keyProps.getProperty("storePassword")
                 keyAlias = keyProps.getProperty("keyAlias")
                 keyPassword = keyProps.getProperty("keyPassword")
+            } else {
+                // 回退：仓库内固定的“个人侧载”密钥（用户已同意提交），使 SHA1 稳定（高德 Key 需绑定）。
+                // 正式发布请用 scripts/gen_keystore.sh 生成自己的密钥并配置 key.properties。
+                storeFile = file("fixed-signing.jks")
+                storePassword = "543eeabe2c6ef7710bf1a90c"
+                keyAlias = "couple"
+                keyPassword = "543eeabe2c6ef7710bf1a90c"
             }
         }
     }
 
     buildTypes {
         release {
-            // 有 key.properties 用正式 keystore，否则回退 debug 签名（仅便于本地试装）
-            signingConfig = if (keyProps.containsKey("storeFile")) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
+            // 有 key.properties 用正式 keystore，否则用仓库内固定密钥
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true // R8
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")

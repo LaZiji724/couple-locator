@@ -28,7 +28,7 @@
 ## 高德控制台需要填的三项
 - **Android 包名**：`com.couple.couple_locator`
 - **Android SHA1（发布版）**：`FA:A0:3A:05:F5:10:D7:8B:41:4C:3E:73:D6:F3:6E:BB:86:67:00:55`
-  - 对应一把固定的发布密钥，其内容放在 GitHub Secrets `ANDROID_KEYSTORE_B64` 与 `ANDROID_KEYSTORE_PASSWORD`（别名 `couple`），**不进仓库**。配置后 CI 每次打包的 SHA1 都相同。
+  - 对应仓库内固定的个人侧载密钥 `android/app/fixed-signing.jks`（别名 `couple`，应用户要求提交，密码见 `android/app/build.gradle.kts`）。**仓库公开，任何人都能用同一把密钥签名，仅适合个人侧载**；正式发布请用 `scripts/gen_keystore.sh` 生成自己的密钥并配置 CI Secrets（Secrets 优先于该固定密钥），再把新 SHA1 绑到高德。
   - 调试版 SHA1 是每台开发机的 `~/.android/debug.keystore`，如需本地 `flutter run` 另行添加。
   - 务必备份这把密钥；丢失后无法覆盖安装升级，且 SHA1 会变化。
 - **iOS Bundle ID**：`com.couple.coupleLocator`
