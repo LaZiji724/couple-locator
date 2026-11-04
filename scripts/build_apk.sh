@@ -11,7 +11,10 @@ AMAP_KEY=$(python3 -c "import json,sys;print(json.load(open('$ENV_FILE')).get('A
 export AMAP_ANDROID_KEY="$AMAP_KEY"
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs
-flutter build apk --release --split-per-abi --dart-define-from-file="$ENV_FILE"
+# CI 设置 SKIP_SPLIT=1：只出通用包（更快，也避开第二次 Gradle 构建偶发的 file-watcher 卡死）
+if [ "${SKIP_SPLIT:-0}" != "1" ]; then
+  flutter build apk --release --split-per-abi --dart-define-from-file="$ENV_FILE"
+fi
 flutter build apk --release --dart-define-from-file="$ENV_FILE"
 mkdir -p dist
 cp build/app/outputs/flutter-apk/*.apk dist/

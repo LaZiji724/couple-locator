@@ -65,6 +65,9 @@ jobs:
             printf 'storePassword=%s\nkeyPassword=%s\nkeyAlias=couple\nstoreFile=upload-keystore.jks\n' "$KS_PASSWORD" "$KS_PASSWORD" > android/key.properties
           fi
       - run: bash scripts/build_apk.sh env/ci.json
+        env:
+          SKIP_SPLIT: "1"
+        timeout-minutes: 30
       - uses: actions/upload-artifact@v4
         with:
           name: android-apk
