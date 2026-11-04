@@ -115,7 +115,8 @@ jobs:
 
   release:
     # 仅 main 分支的 push：构建全部成功后自动发布 GitHub Release，用户直接在 Release 页下载安装
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # 提交信息含 [no-release] 时不发布（用于合并中间提交，避免产生多余版本）
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, '[no-release]')
     needs: [android, ios]
     runs-on: ubuntu-latest
     steps:
@@ -129,7 +130,10 @@ jobs:
           MSG: ${{ github.event.head_commit.message }}
         run: |
           set -euo pipefail
-          TAG="v1.0.${{ github.run_number }}"
+          # 版本号取自 pubspec.yaml（如 2.0.0+2 → v2.0.0）；同一版本重复发布时追加构建序号避免标签冲突
+          VER="$(grep -m1 '^version:' pubspec.yaml | sed -E 's/version:[[:space:]]*([0-9.]+).*/\1/')"
+          TAG="v${VER}"
+          if gh release view "$TAG" >/dev/null 2>&1; then TAG="v${VER}-build${{ github.run_number }}"; fi
           mkdir -p rel
           cp artifacts/android-apk/app-release.apk rel/CoupleLocator-android.apk
           cp artifacts/ios-ipa-noext/CoupleLocator-noext.ipa rel/CoupleLocator-ios-noext.ipa
