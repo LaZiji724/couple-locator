@@ -22,7 +22,7 @@ void main() {
         theme: dark ? AppTheme.dark() : AppTheme.light(),
         home: Scaffold(
           body: ListView(children: [
-            GradientButton(label: '我到了', onTap: () {}),
+            PrimaryButton(label: '我到了', onTap: () {}),
             const SoftButton(label: '次要'),
             const GlassPanel(child: Text('毛玻璃')),
             AvatarBubble(palette: PersonalPalette.all[3], emoji: '🐱'),

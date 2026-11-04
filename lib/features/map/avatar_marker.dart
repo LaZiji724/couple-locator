@@ -89,7 +89,7 @@ class AvatarMarkerPainter {
       final b = Offset(cx + r * 0.72, cy - r * 0.72);
       c.drawCircle(b, 10, ui.Paint()..color = const Color(0xFFFFFFFF));
       c.drawCircle(b, 8, ui.Paint()..color = const Color(0xFFFF4D6D));
-      final tp = TextPainter(text: const TextSpan(text: '!', style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 11, fontWeight: FontWeight.w900)), textDirection: TextDirection.ltr)..layout();
+      final tp = TextPainter(text: const TextSpan(text: '!', style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 12, fontWeight: FontWeight.w700)), textDirection: TextDirection.ltr)..layout();
       tp.paint(c, Offset(b.dx - tp.width / 2, b.dy - tp.height / 2));
     }
     if (paused) {
@@ -127,10 +127,10 @@ class AvatarMarkerPainter {
       ..color = const Color(0x55A78BFA)
       ..maskFilter = const ui.MaskFilter.blur(ui.BlurStyle.normal, 5));
     final tri = ui.Path()..moveTo(w / 2 - 7, 38)..lineTo(w / 2 + 7, 38)..lineTo(w / 2, 52)..close();
-    c.drawPath(tri, ui.Paint()..color = AppColors.grape);
-    c.drawCircle(const Offset(w / 2, 22), 19, ui.Paint()..color = AppColors.grape);
+    c.drawPath(tri, ui.Paint()..color = AppColors.accent);
+    c.drawCircle(const Offset(w / 2, 22), 19, ui.Paint()..color = AppColors.accent);
     c.drawCircle(const Offset(w / 2, 22), 16, ui.Paint()..color = const Color(0xFFFFFFFF));
-    final tp = TextPainter(text: TextSpan(text: emoji, style: const TextStyle(fontSize: 20)), textDirection: TextDirection.ltr)..layout();
+    final tp = TextPainter(text: TextSpan(text: emoji, style: const TextStyle(fontSize: 16)), textDirection: TextDirection.ltr)..layout();
     tp.paint(c, Offset(w / 2 - tp.width / 2, 22 - tp.height / 2));
     final img = await rec.endRecording().toImage((w * scale).round(), (h * scale).round());
     final data = await img.toByteData(format: ui.ImageByteFormat.png);

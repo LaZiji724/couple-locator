@@ -59,7 +59,7 @@ class _StatsPageState extends ConsumerState<StatsPage> {
     final r = _r;
     return Scaffold(
       appBar: AppBar(title: const Text('轨迹统计')),
-      body: FlowingBlobs(
+      body: PaperBackdrop(
         child: SafeArea(
           child: ListView(padding: const EdgeInsets.all(20), children: [
             Center(
@@ -86,24 +86,22 @@ class _StatsPageState extends ConsumerState<StatsPage> {
               Row(children: [
                 Expanded(
                   child: VibeCard(
-                    tint: AppColors.coral,
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Row(children: [Icon(PhosphorIconsFill.heart, color: v.accentText, size: 20), const SizedBox(width: 6), Text('在一起', style: TextStyle(color: v.inkSoft, fontWeight: FontWeight.w700))]),
                       const SizedBox(height: 8),
-                      RollingNumber(value: r.together.inMinutes / 60, decimals: 1, suffix: ' 小时', style: const TextStyle(fontFamily: AppTheme.displayFont, fontSize: 26)),
-                      Text('两人距离小于 100 米', style: TextStyle(color: v.inkSoft, fontSize: 11.5)),
+                      RollingNumber(value: r.together.inMinutes / 60, decimals: 1, suffix: ' 小时', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 22, color: v.ink)),
+                      Text('两人距离小于 100 米', style: TextStyle(color: v.inkSoft, fontSize: 12)),
                     ]),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: VibeCard(
-                    tint: AppColors.grape,
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Row(children: [Icon(PhosphorIconsFill.mapPin, color: AppColors.grape, size: 20), const SizedBox(width: 6), Text('停留最久', style: TextStyle(color: v.inkSoft, fontWeight: FontWeight.w700))]),
+                      Row(children: [Icon(PhosphorIconsFill.mapPin, color: v.accentText, size: 20), const SizedBox(width: 6), Text('停留最久', style: TextStyle(color: v.inkSoft, fontWeight: FontWeight.w700))]),
                       const SizedBox(height: 8),
-                      Text(_stayName ?? '暂无', maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontFamily: AppTheme.displayFont, fontSize: 18)),
-                      if ((r.longestStayMine ?? r.longestStayPartner) != null) Text(durationText((r.longestStayMine ?? r.longestStayPartner)!.duration), style: TextStyle(color: v.inkSoft, fontSize: 11.5)),
+                      Text(_stayName ?? '暂无', maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: v.ink)),
+                      if ((r.longestStayMine ?? r.longestStayPartner) != null) Text(durationText((r.longestStayMine ?? r.longestStayPartner)!.duration), style: TextStyle(color: v.inkSoft, fontSize: 12)),
                     ]),
                   ),
                 ),
@@ -116,12 +114,12 @@ class _StatsPageState extends ConsumerState<StatsPage> {
                   child: BarChart(
                     BarChartData(
                       alignment: BarChartAlignment.spaceAround,
-                      gridData: FlGridData(drawVerticalLine: false, getDrawingHorizontalLine: (_) => FlLine(color: v.inkSoft.withValues(alpha: 0.15), strokeWidth: 1)),
+                      gridData: FlGridData(drawVerticalLine: false, getDrawingHorizontalLine: (_) => FlLine(color: v.inkSoft.withValues(alpha: 0.15), strokeWidth: 0.5)),
                       borderData: FlBorderData(show: false),
                       titlesData: FlTitlesData(
                         topTitles: const AxisTitles(),
                         rightTitles: const AxisTitles(),
-                        leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 34, getTitlesWidget: (x, _) => Text(x.toStringAsFixed(x < 10 ? 1 : 0), style: TextStyle(fontSize: 10, color: v.inkSoft)))),
+                        leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 34, getTitlesWidget: (x, _) => Text(x.toStringAsFixed(x < 10 ? 1 : 0), style: TextStyle(fontSize: 12, color: v.inkSoft)))),
                         bottomTitles: AxisTitles(
                           sideTitles: SideTitles(
                             showTitles: true,
@@ -130,7 +128,7 @@ class _StatsPageState extends ConsumerState<StatsPage> {
                               final i = x.toInt();
                               if (i < 0 || i >= r.perDayMine.length) return const SizedBox.shrink();
                               final d = r.perDayMine[i].day;
-                              return Padding(padding: const EdgeInsets.only(top: 6), child: Text('${d.month}/${d.day}', style: TextStyle(fontSize: 10, color: v.inkSoft)));
+                              return Padding(padding: const EdgeInsets.only(top: 6), child: Text('${d.month}/${d.day}', style: TextStyle(fontSize: 12, color: v.inkSoft)));
                             },
                           ),
                         ),
@@ -179,12 +177,12 @@ class _BigCard extends StatelessWidget {
   final String suffix;
   @override
   Widget build(BuildContext context) {
+    final v = context.vibes;
     return VibeCard(
-      gradient: gradient,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [Icon(icon, color: AppColors.onGradient, size: 20), const SizedBox(width: 6), Text(title, style: const TextStyle(color: AppColors.onGradient, fontWeight: FontWeight.w700))]),
-        const SizedBox(height: 10),
-        RollingNumber(value: value, decimals: 1, suffix: suffix, style: const TextStyle(fontFamily: AppTheme.displayFont, fontSize: 30, color: AppColors.onGradient)),
+        Row(children: [Icon(icon, color: gradient.colors.first, size: 20), const SizedBox(width: 8), Text(title, style: TextStyle(color: v.inkSoft, fontWeight: FontWeight.w600))]),
+        const SizedBox(height: 8),
+        RollingNumber(value: value, decimals: 1, suffix: suffix, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 22, color: v.ink)),
       ]),
     );
   }

@@ -4,6 +4,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../app/providers.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/tokens.dart';
 import '../../core/widgets/vibe_widgets.dart';
 
 /// A4：共享开关底部面板。暂停期间不采集不上传，对方看到「对方暂停了共享」。
@@ -46,17 +47,17 @@ class _ShareSheet extends ConsumerWidget {
     final paused = s?.isPaused() ?? false;
     final v = context.vibes;
     return GlassPanel(
-      radius: 32,
+      radius: AppRadii.card,
       padding: EdgeInsets.fromLTRB(20, 14, 20, 20 + MediaQuery.of(context).padding.bottom),
       child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Center(child: Container(width: 40, height: 5, decoration: BoxDecoration(color: v.inkSoft.withValues(alpha: 0.4), borderRadius: BorderRadius.circular(9)))),
+        Center(child: Container(width: 40, height: 5, decoration: BoxDecoration(color: v.inkSoft.withValues(alpha: 0.4), borderRadius: BorderRadius.circular(4)))),
         const SizedBox(height: 16),
         Text(paused ? '共享已暂停' : '暂停共享位置', style: Theme.of(context).textTheme.titleLarge),
         const SizedBox(height: 6),
         Text(paused ? '暂停期间不采集、不上传；TA 会看到「对方暂停了共享」，而不是掉线。' : '暂停期间不采集、不上传。TA 会看到你「暂停了共享」。', style: TextStyle(color: v.inkSoft)),
         const SizedBox(height: 18),
         if (paused)
-          GradientButton(label: '恢复共享', icon: PhosphorIconsFill.play, onTap: () => _resume(context, ref))
+          PrimaryButton(label: '恢复共享', icon: PhosphorIconsFill.play, onTap: () => _resume(context, ref))
         else
           Wrap(spacing: 10, runSpacing: 10, children: [
             _Opt('30 分钟', () => _pause(context, ref, const Duration(minutes: 30))),

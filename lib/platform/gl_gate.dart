@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:phosphor_flutter/phosphor_flutter.dart';
+
 import '../core/log.dart';
 import '../core/theme/app_theme.dart';
 
@@ -41,11 +43,11 @@ class GlGate extends StatelessWidget {
         if (snap.data == true) return child;
         final v = context.vibes;
         return Container(
-          decoration: BoxDecoration(gradient: v.sunrise.scale(0.25)),
+          color: v.bg,
           alignment: Alignment.center,
           padding: const EdgeInsets.all(32),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
-            const Text('🗺️', style: TextStyle(fontSize: 56)),
+            Icon(PhosphorIconsRegular.mapTrifold, size: 48, color: v.inkSoft),
             const SizedBox(height: 12),
             Text('这台设备暂时无法显示地图', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 8),

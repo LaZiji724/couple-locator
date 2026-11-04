@@ -34,10 +34,10 @@ class _PartnerSheet extends ConsumerWidget {
     final paused = s.partnerPresence?.isPausedNow(DateTime.now()) ?? false;
     final name = (s.partner?.nickname.isNotEmpty ?? false) ? s.partner!.nickname : 'TA';
     return GlassPanel(
-      radius: 32,
+      radius: AppRadii.card,
       padding: EdgeInsets.fromLTRB(20, 14, 20, 20 + MediaQuery.of(context).padding.bottom),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Container(width: 40, height: 5, decoration: BoxDecoration(color: v.inkSoft.withValues(alpha: 0.4), borderRadius: BorderRadius.circular(9))),
+        Container(width: 40, height: 5, decoration: BoxDecoration(color: v.inkSoft.withValues(alpha: 0.4), borderRadius: BorderRadius.circular(4))),
         const SizedBox(height: 16),
         Row(children: [
           Hero(tag: 'partner-avatar-sheet', child: AvatarBubble(palette: pal, emoji: s.partner?.avatarEmoji, imageUrl: s.partner?.avatarUrl, size: 68, dimmed: paused)),
@@ -57,13 +57,13 @@ class _PartnerSheet extends ConsumerWidget {
             const SizedBox(width: 10),
             Expanded(child: _Stat(icon: Icon(st.charging ? PhosphorIconsFill.batteryCharging : PhosphorIconsFill.batteryHigh, color: st.lowBattery ? v.danger : AppColors.mint, size: 24), label: '${st.battery}%${st.charging ? ' 充电中' : ''}${st.lowBattery ? ' 低电量' : ''}', danger: st.lowBattery)),
             const SizedBox(width: 10),
-            Expanded(child: _Stat(icon: Icon(st.network == 'wifi' ? PhosphorIconsFill.wifiHigh : (st.network == 'cellular' ? PhosphorIconsFill.cellSignalHigh : PhosphorIconsFill.wifiSlash), color: AppColors.sky, size: 24), label: '${st.network == 'wifi' ? 'Wi-Fi' : st.network == 'cellular' ? '蜂窝' : '无网络'}${st.lowPower ? ' · 省电' : ''}')),
+            Expanded(child: _Stat(icon: Icon(st.network == 'wifi' ? PhosphorIconsFill.wifiHigh : (st.network == 'cellular' ? PhosphorIconsFill.cellSignalHigh : PhosphorIconsFill.wifiSlash), color: context.vibes.inkSoft, size: 24), label: '${st.network == 'wifi' ? 'Wi-Fi' : st.network == 'cellular' ? '蜂窝' : '无网络'}${st.lowPower ? '，省电' : ''}')),
           ])
         else
           Text('还没有收到对方的状态信息', style: TextStyle(color: v.inkSoft)),
         const SizedBox(height: 18),
         Row(children: [
-          Expanded(child: GradientButton(label: '戳一戳', height: 48, icon: PhosphorIconsFill.handWaving, onTap: () => _poke(context, ref))),
+          Expanded(child: PrimaryButton(label: '戳一戳', height: 48, icon: PhosphorIconsFill.handWaving, onTap: () => _poke(context, ref))),
           const SizedBox(width: 10),
           SoftButton(label: '看轨迹', icon: PhosphorIconsRegular.path, onTap: () {
             Navigator.pop(context);
@@ -106,7 +106,7 @@ class _PokePicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassPanel(
-      radius: 32,
+      radius: AppRadii.card,
       padding: EdgeInsets.fromLTRB(20, 20, 20, 24 + MediaQuery.of(context).padding.bottom),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         Text('选一个表情戳 TA', style: Theme.of(context).textTheme.titleLarge),
@@ -124,7 +124,7 @@ class _PokePicker extends StatelessWidget {
                 child: Squish(
                   onTap: () => Navigator.pop(context, e),
                   child: Container(
-                    decoration: BoxDecoration(color: context.vibes.surface.withValues(alpha: 0.7), borderRadius: BorderRadius.circular(22)),
+                    decoration: BoxDecoration(color: context.vibes.surface.withValues(alpha: 0.7), borderRadius: BorderRadius.circular(AppRadii.small)),
                     alignment: Alignment.center,
                     child: Text(e, style: const TextStyle(fontSize: 34)),
                   ),
@@ -147,7 +147,7 @@ class _Stat extends StatelessWidget {
     final v = context.vibes;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-      decoration: BoxDecoration(color: (danger ? v.danger : v.surface).withValues(alpha: danger ? 0.15 : 0.7), borderRadius: BorderRadius.circular(20)),
+      decoration: BoxDecoration(color: (danger ? v.danger : v.surface).withValues(alpha: danger ? 0.15 : 0.7), borderRadius: BorderRadius.circular(AppRadii.small)),
       child: Column(children: [icon, const SizedBox(height: 6), Text(label, textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: danger ? v.danger : v.ink, fontWeight: FontWeight.w600))]),
     );
   }

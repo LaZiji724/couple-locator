@@ -88,10 +88,10 @@ class _HomeShellState extends ConsumerState<HomeShell> {
         const SettingsPage(),
       ]),
       bottomNavigationBar: Padding(
-        padding: EdgeInsets.fromLTRB(20, 0, 20, bottom + 12),
+        padding: EdgeInsets.fromLTRB(16, 0, 16, bottom + 12),
         child: GlassPanel(
-          radius: 999,
-          padding: const EdgeInsets.all(6),
+          radius: AppRadii.card,
+          padding: const EdgeInsets.all(8),
           child: Row(children: [
             for (final (idx, t) in _tabs.indexed)
               Expanded(
@@ -100,12 +100,15 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                   child: AnimatedContainer(
                     duration: Motion.of(context, Motion.normal),
                     curve: Motion.spring,
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    decoration: BoxDecoration(gradient: _i == idx ? AppColors.sunrise : null, borderRadius: BorderRadius.circular(999)),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      color: _i == idx ? AppColors.accent.withValues(alpha: v.isDark ? 0.24 : 0.10) : Colors.transparent,
+                      borderRadius: BorderRadius.circular(AppRadii.small),
+                    ),
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
-                      AnimatedScale(scale: _i == idx ? 1.12 : 1, duration: Motion.of(context, Motion.normal), curve: Motion.spring, child: Icon(_i == idx ? t.$2 : t.$1, size: 24, color: _i == idx ? AppColors.onGradient : v.inkSoft)),
-                      const SizedBox(height: 2),
-                      Text(t.$3, style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: _i == idx ? AppColors.onGradient : v.inkSoft)),
+                      Icon(_i == idx ? t.$2 : t.$1, size: 24, color: _i == idx ? v.accentText : v.inkSoft),
+                      const SizedBox(height: 4),
+                      Text(t.$3, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: _i == idx ? v.accentText : v.inkSoft)),
                     ]),
                   ),
                 ),

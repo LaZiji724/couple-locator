@@ -56,7 +56,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
   Widget build(BuildContext context) {
     final v = context.vibes;
     return Scaffold(
-      body: FlowingBlobs(
+      body: PaperBackdrop(
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
@@ -66,16 +66,20 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                 child: Column(children: [
                   const SizedBox(height: 8),
                   SizedBox(
-                    height: 120,
+                    height: 96,
                     child: Stack(alignment: Alignment.center, children: [
-                      Positioned(left: 70, child: AvatarBubble(palette: PersonalPalette.all[0], emoji: '🐱', size: 78)),
-                      Positioned(right: 70, child: AvatarBubble(palette: PersonalPalette.all[2], emoji: '🐶', size: 78)),
-                      const Positioned(top: 8, child: Text('💗', style: TextStyle(fontSize: 34))),
+                      Positioned(left: 96, child: AvatarBubble(palette: PersonalPalette.all[0], emoji: '🐱', size: 80)),
+                      Positioned(right: 96, child: AvatarBubble(palette: PersonalPalette.all[2], emoji: '🐶', size: 80)),
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(color: v.bg, shape: BoxShape.circle),
+                        child: const Icon(PhosphorIconsFill.heart, size: 20, color: AppColors.accent),
+                      ),
                     ]),
                   ),
-                  const SizedBox(height: 12),
-                  GradientText('甜蜜定位', style: const TextStyle(fontFamily: AppTheme.displayFont, fontSize: 40)),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 24),
+                  Text('甜蜜定位', style: Theme.of(context).textTheme.displaySmall),
+                  const SizedBox(height: 8),
                   Text('只属于你们两个人的小世界', style: TextStyle(color: v.inkSoft)),
                   const SizedBox(height: 28),
                   VibeCard(
@@ -103,14 +107,14 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                       ),
                       if (_signup) ...[
                         const SizedBox(height: 10),
-                        Text('无需邮箱。但这也意味着忘记密码无法找回，请牢记并在「设置」里备份密钥。', style: TextStyle(color: v.inkSoft, fontSize: 12.5)),
+                        Text('无需邮箱。但这也意味着忘记密码无法找回，请牢记并在「设置」里备份密钥。', style: TextStyle(color: v.inkSoft, fontSize: 12)),
                       ],
                       if (_err != null) ...[
                         const SizedBox(height: 12),
                         Text(_err!, style: TextStyle(color: v.danger, fontWeight: FontWeight.w600)),
                       ],
                       const SizedBox(height: 20),
-                      GradientButton(label: _signup ? '注册并开始' : '登录', busy: _busy, onTap: _busy ? null : _submit),
+                      PrimaryButton(label: _signup ? '注册并开始' : '登录', busy: _busy, onTap: _busy ? null : _submit),
                     ]),
                   ),
                 ]),

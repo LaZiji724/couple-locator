@@ -23,8 +23,7 @@ void main() {
     expect(ratio(AppColors.inkSoftDark, AppColors.nightBg), greaterThanOrEqualTo(4.5));
     expect(ratio(AppColors.accentTextDark, AppColors.nightBg), greaterThanOrEqualTo(4.5));
     expect(ratio(AppColors.inkSoftDark, AppColors.nightSurface), greaterThanOrEqualTo(4.5));
-    for (final c in [AppColors.coral, AppColors.peach, AppColors.sun]) {
-      expect(ratio(AppColors.onGradient, c), greaterThanOrEqualTo(4.5), reason: '$c');
-    }
+    expect(ratio(AppColors.inkSoftLight, AppColors.surfaceHighLight), greaterThanOrEqualTo(4.5));
+    expect(ratio(AppColors.onAccent, AppColors.accent), greaterThanOrEqualTo(4.5));
   });
 }

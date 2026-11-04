@@ -327,7 +327,7 @@ class _MapPageState extends ConsumerState<MapPage> with SingleTickerProviderStat
         Positioned(
           left: (_meScreen!.dx + _partnerScreen!.dx) / 2 - 44,
           top: (_meScreen!.dy + _partnerScreen!.dy) / 2 - 20 - 30,
-          child: IgnorePointer(child: GlassPanel(radius: 20, padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), blur: 10, child: _DistanceLabel(meters: dist))),
+          child: IgnorePointer(child: GlassPanel(radius: AppRadii.small, padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), blur: 10, child: _DistanceLabel(meters: dist))),
         ),
       ..._effects,
       // 顶部状态条
@@ -350,13 +350,13 @@ class _MapPageState extends ConsumerState<MapPage> with SingleTickerProviderStat
         right: 16,
         bottom: media.padding.bottom + 84,
         child: Row(children: [
-          Expanded(child: GradientButton(label: '我到了', icon: PhosphorIconsFill.houseLine, onTap: () => _arrived(context))),
+          Expanded(child: PrimaryButton(label: '我到了', icon: PhosphorIconsFill.houseLine, onTap: () => _arrived(context))),
           const SizedBox(width: 14),
           SosButton(onTriggered: () => triggerSos(context, ref)),
         ]),
       ),
       if (s.keyProblem != null)
-        Positioned(top: media.padding.top + 76, left: 24, right: 24, child: GlassPanel(radius: 18, padding: const EdgeInsets.all(12), child: Text(s.keyProblem!, style: TextStyle(color: v.ink)))),
+        Positioned(top: media.padding.top + 76, left: 24, right: 24, child: GlassPanel(radius: AppRadii.small, padding: const EdgeInsets.all(12), child: Text(s.keyProblem!, style: TextStyle(color: v.ink)))),
       if (!AppConfigHint.mapReady)
         Positioned.fill(child: _MapKeyMissing()),
     ]);
@@ -368,7 +368,7 @@ class _MapPageState extends ConsumerState<MapPage> with SingleTickerProviderStat
     try {
       final p = ref.read(syncProvider).myPoint ?? (await TrackerService.instance.iosCore?.currentOnce().then((e) => e == null ? null : LocPoint(ts: DateTime.now(), lat: e.latitude, lng: e.longitude)));
       final name = p == null ? '' : await ref.read(syncProvider.notifier).placeName(p.lat, p.lng);
-      await ref.read(syncProvider.notifier).sendEvent(EventKind.arrived, lat: p?.lat, lng: p?.lng, text: name.isEmpty ? '已安全到达' : '已安全到达 · $name');
+      await ref.read(syncProvider.notifier).sendEvent(EventKind.arrived, lat: p?.lat, lng: p?.lng, text: name.isEmpty ? '已安全到达' : '已安全到达（$name）');
       TrackerService.instance.flushNow();
       messenger.showSnackBar(const SnackBar(content: Text('已告诉 TA：你到啦 🏠')));
     } catch (e) {
@@ -395,7 +395,7 @@ class _DistanceLabel extends StatelessWidget {
     return Row(mainAxisSize: MainAxisSize.min, children: [
       Icon(PhosphorIconsFill.heartStraight, size: 14, color: context.vibes.accentText),
       const SizedBox(width: 6),
-      RollingNumber(value: km ? meters / 1000 : meters, decimals: km ? 2 : 0, suffix: km ? ' km' : ' m', style: TextStyle(fontFamily: AppTheme.displayFont, fontSize: 16, color: context.vibes.ink)),
+      RollingNumber(value: km ? meters / 1000 : meters, decimals: km ? 2 : 0, suffix: km ? ' km' : ' m', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: context.vibes.ink)),
     ]);
   }
 }
@@ -417,20 +417,20 @@ class _TopBar extends ConsumerWidget {
         : pt != null
             ? agoText(pt.ts)
             : hb != null
-                ? '${shortAgo(hb)}在线 · 暂无位置'
+                ? '${shortAgo(hb)}在线，暂无位置'
                 : '等待 TA 的位置…';
     final settings = ref.watch(settingsProvider);
     final myPaused = settings?.isPaused() ?? false;
     return GlassPanel(
       padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
-      radius: 28,
+      radius: AppRadii.card,
       child: Row(children: [
         Hero(tag: 'partner-avatar', child: AvatarBubble(palette: pal, emoji: s.partner?.avatarEmoji, imageUrl: s.partner?.avatarUrl, size: 44, dimmed: paused)),
         const SizedBox(width: 10),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(name, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontFamily: AppTheme.displayFont)),
-            Text(sub, style: TextStyle(color: paused ? v.accentText : v.inkSoft, fontSize: 12.5)),
+            Text(name, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+            Text(sub, style: TextStyle(color: paused ? v.accentText : v.inkSoft, fontSize: 12)),
           ]),
         ),
         if (s.partnerStatus != null) _BatteryChip(st: s.partnerStatus!),
@@ -441,14 +441,13 @@ class _TopBar extends ConsumerWidget {
             duration: Motion.of(context, Motion.normal),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              gradient: myPaused ? null : AppColors.sunrise,
-              color: myPaused ? v.inkSoft.withValues(alpha: 0.2) : null,
+              color: myPaused ? v.surfaceHigh : AppColors.accent.withValues(alpha: v.isDark ? 0.24 : 0.10),
               borderRadius: BorderRadius.circular(999),
             ),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Icon(myPaused ? PhosphorIconsFill.pause : PhosphorIconsFill.broadcast, size: 16, color: myPaused ? v.ink : AppColors.onGradient),
+              Icon(myPaused ? PhosphorIconsFill.pause : PhosphorIconsFill.broadcast, size: 16, color: myPaused ? v.ink : v.accentText),
               const SizedBox(width: 4),
-              Text(myPaused ? '已暂停' : '共享中', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5, color: myPaused ? v.ink : AppColors.onGradient)),
+              Text(myPaused ? '已暂停' : '共享中', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: myPaused ? v.ink : v.accentText)),
             ]),
           ),
         ),
