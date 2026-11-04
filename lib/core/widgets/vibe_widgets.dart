@@ -87,7 +87,7 @@ class PrimaryButton extends StatelessWidget {
         if (busy || icon != null) const SizedBox(width: 8),
         Text(label,
             style: const TextStyle(
-                color: AppColors.onAccent, fontSize: 14, fontWeight: FontWeight.w600)),
+                color: AppColors.onAccent, fontSize: 13, fontWeight: FontWeight.w600)),
       ],
     );
     return Squish(
@@ -147,7 +147,7 @@ class SoftButton extends StatelessWidget {
           ),
           child: Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.center, children: [
             if (icon != null) ...[Icon(icon, size: 18, color: c), const SizedBox(width: 8)],
-            Text(label, style: TextStyle(color: c, fontWeight: FontWeight.w600, fontSize: 14)),
+            Text(label, style: TextStyle(color: c, fontWeight: FontWeight.w600, fontSize: 13)),
           ]),
         ),
       ),

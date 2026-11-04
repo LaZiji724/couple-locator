@@ -364,7 +364,7 @@ class _StayTile extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.only(bottom: 14),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                Text(name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
                 const SizedBox(height: 4),
                 Row(children: [
                   Text('${hm(st.start)} – ${hm(st.end)}', style: TextStyle(color: v.inkSoft, fontSize: 12)),

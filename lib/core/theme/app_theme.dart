@@ -109,7 +109,7 @@ abstract final class AppTheme {
       outlineVariant: v.hairline,
     );
 
-    // 字号只用 4 档：展示 24 / 标题 18 / 正文 14 / 说明 12。
+    // 字号只用 4 档：展示 22 / 标题 16 / 正文 13 / 说明 12。
     TextStyle t(double size, FontWeight w, {double height = 1.35}) =>
         TextStyle(fontSize: size, fontWeight: w, color: v.ink, height: height);
 
@@ -127,16 +127,16 @@ abstract final class AppTheme {
       textTheme: base.textTheme
           .apply(bodyColor: v.ink, displayColor: v.ink)
           .copyWith(
-            displaySmall: t(24, FontWeight.w700, height: 1.2),
-            headlineMedium: t(24, FontWeight.w700, height: 1.2),
-            headlineSmall: t(18, FontWeight.w700, height: 1.25),
-            titleLarge: t(18, FontWeight.w700, height: 1.25),
-            titleMedium: t(14, FontWeight.w600),
-            titleSmall: t(14, FontWeight.w600),
-            bodyLarge: t(14, FontWeight.w400, height: 1.5),
-            bodyMedium: t(14, FontWeight.w400, height: 1.5),
+            displaySmall: t(22, FontWeight.w700, height: 1.2),
+            headlineMedium: t(22, FontWeight.w700, height: 1.2),
+            headlineSmall: t(16, FontWeight.w700, height: 1.25),
+            titleLarge: t(16, FontWeight.w700, height: 1.25),
+            titleMedium: t(13, FontWeight.w600),
+            titleSmall: t(13, FontWeight.w600),
+            bodyLarge: t(13, FontWeight.w400, height: 1.5),
+            bodyMedium: t(13, FontWeight.w400, height: 1.5),
             bodySmall: t(12, FontWeight.w400),
-            labelLarge: t(14, FontWeight.w600),
+            labelLarge: t(13, FontWeight.w600),
             labelMedium: t(12, FontWeight.w500),
             labelSmall: t(12, FontWeight.w500),
           ),
@@ -146,7 +146,7 @@ abstract final class AppTheme {
         scrolledUnderElevation: 0,
         centerTitle: true,
         foregroundColor: v.ink,
-        titleTextStyle: t(16, FontWeight.w700),
+        titleTextStyle: t(15, FontWeight.w700),
       ),
       cardTheme: CardThemeData(
         color: v.surface,
