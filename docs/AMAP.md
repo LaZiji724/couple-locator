@@ -32,3 +32,7 @@
   - 调试版 SHA1 是每台开发机的 `~/.android/debug.keystore`，如需本地 `flutter run` 另行添加。
   - 务必备份这把密钥；丢失后无法覆盖安装升级，且 SHA1 会变化。
 - **iOS Bundle ID**：`com.couple.coupleLocator`
+
+## 已内置的 Key
+`env/defaults.json` 内置了本项目的高德 Android / iOS Key（Key 不属于机密，受包名+SHA1 / Bundle ID 绑定保护）；
+`scripts/build_*.sh` 会在 env 文件缺失或为 `PLACEHOLDER` 时自动用它们补全。要换成自己的 Key，在 env 文件或 GitHub Secrets 里填写即可覆盖。

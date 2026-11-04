@@ -9,6 +9,7 @@ WITH=0
 if [ "${1:-}" = "--with-widgets" ]; then WITH=1; shift; fi
 ENV_FILE="${1:-env/dev.json}"
 [ -f "$ENV_FILE" ] || { echo "缺少 $ENV_FILE，请复制 env/example.json 并填写"; exit 1; }
+python3 scripts/fill_defaults.py "$ENV_FILE"  # 补全公开的默认高德 Key（env/defaults.json）
 
 if [ "$WITH" = 1 ]; then
   gem list -i xcodeproj >/dev/null 2>&1 || gem install xcodeproj --no-document
