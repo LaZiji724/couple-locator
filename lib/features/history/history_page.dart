@@ -9,6 +9,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:x_amap_base/x_amap_base.dart';
 
+import '../../platform/gl_gate.dart';
 import '../../app/providers.dart';
 import '../../core/format.dart';
 import '../../core/geo/coord.dart';
@@ -201,7 +202,7 @@ class _HistoryPageState extends ConsumerState<HistoryPage> with SingleTickerProv
     final km = totalDistance(_clean) / 1000;
     return Stack(children: [
       Positioned.fill(
-        child: AMapWidget(
+        child: GlGate(child: AMapWidget(
           initialCameraPosition: const CameraPosition(target: LatLng(39.909, 116.397), zoom: 13),
           markers: markers,
           polylines: _lines(pal),
@@ -213,7 +214,7 @@ class _HistoryPageState extends ConsumerState<HistoryPage> with SingleTickerProv
             _ctl = c;
             _fitTrack();
           },
-        ),
+        )),
       ),
       Positioned(
         top: media.padding.top + 8,

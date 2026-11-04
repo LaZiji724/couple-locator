@@ -22,6 +22,7 @@ import '../../core/widgets/effects.dart';
 import '../../core/widgets/vibe_widgets.dart';
 import '../../domain/models/loc_point.dart';
 import '../../domain/models/status.dart';
+import '../../platform/gl_gate.dart';
 import '../../platform/tracker_service.dart';
 import 'avatar_marker.dart';
 import 'partner_sheet.dart';
@@ -295,7 +296,7 @@ class _MapPageState extends ConsumerState<MapPage> with SingleTickerProviderStat
 
     return Stack(children: [
       Positioned.fill(
-        child: AMapWidget(
+        child: GlGate(child: AMapWidget(
           initialCameraPosition: const CameraPosition(target: LatLng(39.909, 116.397), zoom: 14),
           markers: markers,
           polylines: lines,
@@ -316,7 +317,7 @@ class _MapPageState extends ConsumerState<MapPage> with SingleTickerProviderStat
             final w = CoordConverter.gcj02ToWgs84(ll.latitude, ll.longitude);
             showPinEditor(context, ref, at: w);
           },
-        ),
+        )),
       ),
       // 呼吸光晕
       if (_meScreen != null) Positioned(left: _meScreen!.dx - 40, top: _meScreen!.dy - 62, child: BreathingHalo(color: meColor.start, radius: 40)),
