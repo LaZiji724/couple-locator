@@ -40,8 +40,9 @@ jobs:
           cache: true
       - name: 写入配置（来自仓库 Secrets；未配置则用占位值，仅用于验证能否构建）
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          # Supabase URL / anon key 是公开值（本就会打进 App），未配置 Secrets 时使用默认值
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL || 'https://lajpyaigqqtnqguwcbhf.supabase.co' }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhanB5YWlncXF0bnFndXdjYmhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM3NTY2ODEsImV4cCI6MjEwOTMzMjY4MX0.VWNnWOGt-pWXkyWKeA-8yZjwNaw3J835bbmIVqqiAqg' }}
           AMAP_ANDROID_KEY: ${{ secrets.AMAP_ANDROID_KEY }}
           AMAP_IOS_KEY: ${{ secrets.AMAP_IOS_KEY }}
           AMAP_WEB_KEY: ${{ secrets.AMAP_WEB_KEY }}
@@ -83,8 +84,9 @@ jobs:
           cache: true
       - name: 写入配置
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          # Supabase URL / anon key 是公开值（本就会打进 App），未配置 Secrets 时使用默认值
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL || 'https://lajpyaigqqtnqguwcbhf.supabase.co' }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhanB5YWlncXF0bnFndXdjYmhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM3NTY2ODEsImV4cCI6MjEwOTMzMjY4MX0.VWNnWOGt-pWXkyWKeA-8yZjwNaw3J835bbmIVqqiAqg' }}
           AMAP_ANDROID_KEY: ${{ secrets.AMAP_ANDROID_KEY }}
           AMAP_IOS_KEY: ${{ secrets.AMAP_IOS_KEY }}
           AMAP_WEB_KEY: ${{ secrets.AMAP_WEB_KEY }}
