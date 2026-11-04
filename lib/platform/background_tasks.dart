@@ -44,6 +44,9 @@ void workmanagerDispatcher() {
 
 class BackgroundTasks {
   static Future<void> register() async {
+    // iOS：workmanager 的 BGTaskScheduler 需要在原生 AppDelegate 里提前注册任务，否则提交任务会触发
+    // NSException 导致闪退。iOS 端后台唤醒改由「显著位置变化」负责（见 IosLocationChannel），这里直接跳过。
+    if (Platform.isIOS) return;
     await Workmanager().initialize(workmanagerDispatcher);
     await Workmanager().registerPeriodicTask(
       _taskPeriodic,

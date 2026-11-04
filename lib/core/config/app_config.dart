@@ -10,6 +10,14 @@ abstract final class AppConfig {
   // 高德 Web 服务 Key（逆地理编码 REST）
   static const amapWebKey = String.fromEnvironment('AMAP_WEB_KEY', defaultValue: '');
 
-  static bool get backendConfigured => supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty;
+  /// 占位值（如 CI 里的 PLACEHOLDER）或非 http(s) 地址一律视为“未配置”，避免启动时用非法 URL 初始化 Supabase。
+  static bool get backendConfigured {
+    final u = Uri.tryParse(supabaseUrl);
+    return supabaseAnonKey.isNotEmpty &&
+        supabaseAnonKey != 'PLACEHOLDER' &&
+        u != null &&
+        (u.scheme == 'https' || u.scheme == 'http') &&
+        u.host.isNotEmpty;
+  }
   static bool get amapConfigured => amapAndroidKey.isNotEmpty || amapIosKey.isNotEmpty;
 }
