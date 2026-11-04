@@ -24,3 +24,11 @@
 
 ## 坐标
 定位原始数据为 WGS-84，存储和加密均用 WGS-84，仅在**显示/交互**时转换为 GCJ-02（`lib/core/geo/coord.dart`，有单元测试）。长按地图得到的 GCJ-02 会反解回 WGS-84 再存。
+
+## 高德控制台需要填的三项
+- **Android 包名**：`com.couple.couple_locator`
+- **Android SHA1（发布版）**：`FA:A0:3A:05:F5:10:D7:8B:41:4C:3E:73:D6:F3:6E:BB:86:67:00:55`
+  - 对应一把固定的发布密钥，其内容放在 GitHub Secrets `ANDROID_KEYSTORE_B64` 与 `ANDROID_KEYSTORE_PASSWORD`（别名 `couple`），**不进仓库**。配置后 CI 每次打包的 SHA1 都相同。
+  - 调试版 SHA1 是每台开发机的 `~/.android/debug.keystore`，如需本地 `flutter run` 另行添加。
+  - 务必备份这把密钥；丢失后无法覆盖安装升级，且 SHA1 会变化。
+- **iOS Bundle ID**：`com.couple.coupleLocator`
