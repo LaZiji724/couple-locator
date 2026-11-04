@@ -16,3 +16,7 @@ scripts/build_apk.sh env/prod.json   # 产出 dist/*.apk：app-arm64-v8a / armea
 ## 手机权限清单（引导页会逐项申请）
 ACCESS_FINE_LOCATION、ACCESS_BACKGROUND_LOCATION、POST_NOTIFICATIONS、ACTIVITY_RECOGNITION、REQUEST_IGNORE_BATTERY_OPTIMIZATIONS、FOREGROUND_SERVICE(+_LOCATION)、RECEIVE_BOOT_COMPLETED。
 开机自启动由 flutter_foreground_task 的 RebootReceiver 恢复前台服务；服务被杀后由 WorkManager（约 15 分钟）拉起。
+
+## 自动发布 Release
+push 到 `main` 且 Android + 两个 iOS 构建全部成功后，CI 会自动创建 GitHub Release（标签 `v1.0.<构建序号>`），
+并上传 `CoupleLocator-android.apk`、`CoupleLocator-ios-noext.ipa`、`CoupleLocator-ios-widgets.ipa`，直接在 Releases 页下载安装即可。

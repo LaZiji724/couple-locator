@@ -6,6 +6,9 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 env:
   FLUTTER_VERSION: "3.47.9"
 
@@ -106,3 +109,38 @@ jobs:
         with:
           name: ios-ipa-${{ matrix.variant }}
           path: dist/*.ipa
+
+  release:
+    # 仅 main 分支的 push：构建全部成功后自动发布 GitHub Release，用户直接在 Release 页下载安装
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [android, ios]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: 整理并发布 Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MSG: ${{ github.event.head_commit.message }}
+        run: |
+          set -euo pipefail
+          TAG="v1.0.${{ github.run_number }}"
+          mkdir -p rel
+          cp artifacts/android-apk/app-release.apk rel/CoupleLocator-android.apk
+          cp artifacts/ios-ipa-noext/CoupleLocator-noext.ipa rel/CoupleLocator-ios-noext.ipa
+          cp artifacts/ios-ipa-widgets/CoupleLocator-widgets.ipa rel/CoupleLocator-ios-widgets.ipa
+          SUBJECT="$(printf '%s' "$MSG" | head -n1)"
+          cat > notes.md <<EOF
+          ## 本次更新
+          ${SUBJECT}
+
+          ## 怎么装
+          - **Android**：下载 \`CoupleLocator-android.apk\` 直接安装（首次需允许“安装未知应用”）。
+          - **iOS**：下载 IPA 后用全能签 / AltStore / Sideloadly 重签安装。先试 \`CoupleLocator-ios-noext.ipa\`（不含小组件，最稳）；\`CoupleLocator-ios-widgets.ipa\` 含小组件和实时活动，重签后可能受限。
+          - 未签名的 IPA 不能直接装；Android APK 用仓库内固定密钥签名，覆盖安装升级不会冲突。
+
+          提交：${GITHUB_SHA::7}
+          EOF
+          gh release create "$TAG" rel/* --title "$TAG" --notes-file notes.md --target "$GITHUB_SHA"
