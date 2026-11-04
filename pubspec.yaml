@@ -1,7 +1,7 @@
 name: couple_locator
 description: 情侣/双人私密实时位置共享 App
 publish_to: 'none'
-version: 1.0.0+1
+version: 2.0.0+2
 
 environment:
   sdk: ^3.10.0
