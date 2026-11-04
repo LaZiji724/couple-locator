@@ -58,3 +58,4 @@ env/*.json
 dist/
 android/app/upload-keystore.jks
 android/key.properties
+!env/defaults.json
