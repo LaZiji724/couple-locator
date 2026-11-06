@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -7,6 +8,9 @@ class LocalNotifier {
   LocalNotifier._();
   static final instance = LocalNotifier._();
   final _plugin = FlutterLocalNotificationsPlugin();
+
+  /// 用户点击通知时发出 payload（应用内据此跳转）。
+  static final tapStream = StreamController<String?>.broadcast();
   bool _ready = false;
 
   Future<void> init({void Function(String? payload)? onTap}) async {
@@ -15,7 +19,10 @@ class LocalNotifier {
     const ios = DarwinInitializationSettings(requestAlertPermission: false, requestBadgePermission: false, requestSoundPermission: false);
     await _plugin.initialize(
       settings: const InitializationSettings(android: android, iOS: ios),
-      onDidReceiveNotificationResponse: (r) => onTap?.call(r.payload),
+      onDidReceiveNotificationResponse: (r) {
+        tapStream.add(r.payload);
+        onTap?.call(r.payload);
+      },
     );
     _ready = true;
   }
@@ -63,4 +70,8 @@ abstract final class NotifIds {
   static const sos = 101;
   static const arrived = 102;
   static const poke = 103;
+  static const pin = 104;
+  static const share = 105;
+  static const battery = 106;
+  static const pair = 107;
 }

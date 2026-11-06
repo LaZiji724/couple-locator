@@ -5,6 +5,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/theme/app_theme.dart';
+import 'notice.dart';
 import 'providers.dart';
 import 'router.dart';
 
@@ -52,6 +53,7 @@ class _CoupleAppState extends ConsumerState<CoupleApp> with WidgetsBindingObserv
       localizationsDelegates: const [GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, GlobalCupertinoLocalizations.delegate],
       builder: (context, child) => Stack(children: [
         child ?? const SizedBox.shrink(),
+        const NoticeHost(),
         if (_obscure)
           Positioned.fill(
             child: BackdropFilter(

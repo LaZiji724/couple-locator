@@ -1,7 +1,7 @@
 name: couple_locator
 description: 情侣/双人私密实时位置共享 App
 publish_to: 'none'
-version: 2.0.0+2
+version: 2.1.0+3
 
 environment:
   sdk: ^3.10.0
@@ -47,6 +47,7 @@ dependencies:
   url_launcher: any
   flutter_activity_recognition: any
   device_info_plus: any
+  package_info_plus: ^10.2.2
 
 dev_dependencies:
   flutter_test:

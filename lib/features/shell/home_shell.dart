@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
+import '../../app/notice.dart';
 import '../../app/providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/motion.dart';
@@ -20,6 +21,7 @@ import '../history/history_page.dart';
 import '../interact/interact_page.dart';
 import '../map/map_page.dart';
 import '../settings/settings_page.dart';
+import '../update/update_ui.dart';
 
 class HomeShell extends ConsumerStatefulWidget {
   const HomeShell({super.key});
@@ -28,7 +30,6 @@ class HomeShell extends ConsumerStatefulWidget {
 }
 
 class _HomeShellState extends ConsumerState<HomeShell> {
-  int _i = 0;
   Timer? _lost;
 
   @override
@@ -77,13 +78,15 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     ref.listen(syncProvider.select((s) => s.pendingSos), (prev, next) {
       if (next != null && prev == null) context.push('/sos-alert');
     });
+    final tab = ref.watch(homeTabProvider);
     final v = context.vibes;
     final bottom = MediaQuery.of(context).padding.bottom;
-    return Scaffold(
+    return UpdateAutoCheck(
+      child: Scaffold(
       extendBody: true,
-      body: IndexedStack(index: _i, children: [
+      body: IndexedStack(index: tab, children: [
         const MapPage(),
-        _i == 1 ? const HistoryPage() : const SizedBox.shrink(),
+        tab == 1 ? const HistoryPage() : const SizedBox.shrink(),
         const InteractPage(),
         const SettingsPage(),
       ]),
@@ -96,19 +99,19 @@ class _HomeShellState extends ConsumerState<HomeShell> {
             for (final (idx, t) in _tabs.indexed)
               Expanded(
                 child: Squish(
-                  onTap: () => setState(() => _i = idx),
+                  onTap: () => ref.read(homeTabProvider.notifier).set(idx),
                   child: AnimatedContainer(
                     duration: Motion.of(context, Motion.normal),
                     curve: Motion.spring,
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
-                      color: _i == idx ? AppColors.accent.withValues(alpha: v.isDark ? 0.24 : 0.10) : Colors.transparent,
+                      color: tab == idx ? AppColors.accent.withValues(alpha: v.isDark ? 0.24 : 0.10) : Colors.transparent,
                       borderRadius: BorderRadius.circular(AppRadii.small),
                     ),
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
-                      Icon(_i == idx ? t.$2 : t.$1, size: 24, color: _i == idx ? v.accentText : v.inkSoft),
+                      Icon(tab == idx ? t.$2 : t.$1, size: 24, color: tab == idx ? v.accentText : v.inkSoft),
                       const SizedBox(height: 4),
-                      Text(t.$3, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: _i == idx ? v.accentText : v.inkSoft)),
+                      Text(t.$3, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: tab == idx ? v.accentText : v.inkSoft)),
                     ]),
                   ),
                 ),
@@ -116,6 +119,6 @@ class _HomeShellState extends ConsumerState<HomeShell> {
           ]),
         ),
       ),
-    );
+    ));
   }
 }

@@ -10,6 +10,8 @@ import '../../core/theme/tokens.dart';
 import '../../core/widgets/vibe_widgets.dart';
 import '../../domain/location/sampling.dart';
 import '../../platform/tracker_service.dart';
+import '../update/update_service.dart';
+import '../update/update_ui.dart';
 
 /// 「我的」Tab：设置页。
 class SettingsPage extends ConsumerWidget {
@@ -142,6 +144,20 @@ class SettingsPage extends ConsumerWidget {
               ]),
             ]),
           ),
+          const SectionTitle('消息提示'),
+          VibeCard(
+            padding: EdgeInsets.zero,
+            child: SwitchListTile(
+              secondary: Icon(PhosphorIconsRegular.bellRinging, color: v.inkSoft),
+              title: const Text('TA 的互动提示'),
+              subtitle: Text('戳一戳、报平安、新标记、暂停/恢复共享、电量低、配对变化。SOS 始终提醒。', style: TextStyle(color: v.inkSoft, fontSize: 12)),
+              value: store.noticeEnabled,
+              onChanged: (x) async {
+                await store.setNoticeEnabled(x);
+                notifier.touch();
+              },
+            ),
+          ),
           const SectionTitle('后台运行'),
           VibeCard(
             padding: EdgeInsets.zero,
@@ -173,6 +189,16 @@ class SettingsPage extends ConsumerWidget {
               ),
             ]),
           ),
+          const SectionTitle('关于'),
+          VibeCard(
+            padding: EdgeInsets.zero,
+            child: _Tile(
+              icon: PhosphorIconsRegular.arrowCircleUp,
+              title: '检查更新',
+              subtitle: '当前版本 ${ref.watch(currentVersionProvider).value ?? ''}',
+              onTap: () => checkForUpdateManually(context, ref),
+            ),
+          ),
           const SectionTitle('账号'),
           VibeCard(
             padding: EdgeInsets.zero,
@@ -184,6 +210,7 @@ class SettingsPage extends ConsumerWidget {
                   danger: true,
                   onTap: () async {
                     if (!await _confirm(context, '解除配对并删除历史？', '解除后你们将无法互相看到位置，双方的位置、事件和共同标记都会被删除。此操作无法撤销。', ok: '解除')) return;
+                    ref.read(syncProvider.notifier).noteSelfUnpair();
                     await ref.read(backendProvider).unpair(deleteHistory: true);
                     await ref.read(dbProvider).wipeAll();
                     await TrackerService.instance.stop();
