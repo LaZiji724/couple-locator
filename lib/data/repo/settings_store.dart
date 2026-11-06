@@ -21,6 +21,7 @@ class SettingsStore {
   static const kOnboarded = 'onboarded';
   static const kLastNotifiedLost = 'last_lost_notified';
   static const kLastEventTs = 'last_event_ts';
+  static const kNotice = 'notice_enabled';
 
   ReportMode get mode =>
       ReportMode.values.firstWhere((m) => m.name == _p.getString(kMode), orElse: () => ReportMode.balanced);
@@ -60,4 +61,8 @@ class SettingsStore {
 
   int get lastEventTs => _p.getInt(kLastEventTs) ?? 0;
   Future<void> setLastEventTs(int v) => _p.setInt(kLastEventTs, v);
+
+  /// 是否弹出对方互动提示（SOS 不受影响，始终提醒）。
+  bool get noticeEnabled => _p.getBool(kNotice) ?? true;
+  Future<void> setNoticeEnabled(bool v) => _p.setBool(kNotice, v);
 }

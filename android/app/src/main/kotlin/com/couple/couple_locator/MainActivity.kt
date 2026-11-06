@@ -1,10 +1,16 @@
 package com.couple.couple_locator
 
+import android.content.Intent
+import android.net.Uri
 import android.opengl.EGL14
 import android.opengl.EGLConfig
+import android.os.Build
+import android.provider.Settings
+import androidx.core.content.FileProvider
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
+import java.io.File
 
 class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -12,6 +18,37 @@ class MainActivity : FlutterActivity() {
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "couple/gl")
             .setMethodCallHandler { call, result ->
                 if (call.method == "eglOk") result.success(checkEgl()) else result.notImplemented()
+            }
+        // 应用内更新：检查「安装未知应用」权限、跳到授权页、调起系统安装器覆盖安装
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "couple/installer")
+            .setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "canInstall" -> result.success(
+                        Build.VERSION.SDK_INT < Build.VERSION_CODES.O || packageManager.canRequestPackageInstalls()
+                    )
+                    "openInstallSettings" -> try {
+                        startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:$packageName")))
+                        result.success(null)
+                    } catch (e: Exception) {
+                        result.error("settings", e.message, null)
+                    }
+                    "install" -> {
+                        val path = call.argument<String>("path")
+                        if (path == null) {
+                            result.error("args", "missing path", null)
+                        } else try {
+                            val uri = FileProvider.getUriForFile(this, "$packageName.updatefileprovider", File(path))
+                            startActivity(Intent(Intent.ACTION_VIEW).apply {
+                                setDataAndType(uri, "application/vnd.android.package-archive")
+                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            })
+                            result.success(null)
+                        } catch (e: Exception) {
+                            result.error("install", e.message, null)
+                        }
+                    }
+                    else -> result.notImplemented()
+                }
             }
     }
 

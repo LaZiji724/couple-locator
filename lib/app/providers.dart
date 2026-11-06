@@ -19,6 +19,7 @@ import '../domain/models/loc_point.dart';
 import '../domain/models/status.dart';
 import '../platform/geocode.dart';
 import '../platform/notifications.dart';
+import 'notice.dart';
 
 final backendProvider = Provider<Backend>((ref) {
   return SupabaseBackend(Supabase.instance.client);
@@ -153,6 +154,20 @@ class SyncNotifier extends Notifier<SyncState> {
   final _seenEvents = <String>{};
   bool _disposed = false;
   int _bootGen = 0;
+  bool _selfUnpair = false;
+  bool _pinsReady = false;
+  bool _lowBatteryNotified = false;
+
+  /// 设置页主动解除配对前调用，避免把自己的操作当成「对方解除」来提示。
+  void noteSelfUnpair() => _selfUnpair = true;
+
+  String get _partnerName => state.partner?.nickname.isNotEmpty == true ? state.partner!.nickname : 'TA';
+
+  /// 弹出应用内提示（前台横幅 / 后台本地通知）。用户在设置里关闭后不再提示（SOS 除外）。
+  void _notice(AppNotice n, int id) {
+    if (!n.urgent && ref.read(settingsProvider)?.noticeEnabled == false) return;
+    ref.read(noticeCenterProvider).push(n, notifId: id);
+  }
 
   Backend get _b => ref.read(backendProvider);
   AppDb get _db => ref.read(dbProvider);
@@ -181,6 +196,7 @@ class SyncNotifier extends Notifier<SyncState> {
     _subs.clear();
     _timer?.cancel();
     _timer = null;
+    _pinsReady = false;
   }
 
   Future<void> reload() => _boot();
@@ -207,7 +223,15 @@ class SyncNotifier extends Notifier<SyncState> {
       final couple = await _b.getMyCouple();
       state = state.copyWith(loading: false, me: me, couple: couple);
       _subs.add(_b.watchCouple().listen((c) {
-        if ((c?.id) != state.couple?.id) _boot();
+        if ((c?.id) != state.couple?.id) {
+          if (state.couple == null && c != null) {
+            _notice(const AppNotice(emoji: '💞', title: '配对成功', body: 'TA 已加入，现在可以互相看到位置啦', tab: 0), NotifIds.pair);
+          } else if (state.couple != null && c == null && !_selfUnpair) {
+            _notice(AppNotice(emoji: '💔', title: '配对已解除', body: '$_partnerName 解除了你们的配对'), NotifIds.pair);
+          }
+          _selfUnpair = false;
+          _boot();
+        }
       }, onError: (e) => AppLog.w('couple', '$e')));
       if (couple == null) return;
       await _connectPartner(couple, gen);
@@ -234,12 +258,31 @@ class SyncNotifier extends Notifier<SyncState> {
     _subs.add(_b.watchStatus(partnerId).listen((e) async {
       try {
         final j = await ch.open_(e, partnerId, 'status');
-        state = state.copyWith(partnerStatus: DeviceStatus.fromJson(j));
+        final st = DeviceStatus.fromJson(j);
+        state = state.copyWith(partnerStatus: st);
+        if (st.lowBattery && !_lowBatteryNotified) {
+          _lowBatteryNotified = true;
+          _notice(AppNotice(emoji: '🪫', title: '$_partnerName 的手机快没电了', body: '电量只剩 ${st.battery}%，记得提醒 TA 充电', tab: 0), NotifIds.battery);
+        } else if (!st.lowBattery && (st.battery >= 25 || st.charging)) {
+          _lowBatteryNotified = false;
+        }
       } catch (_) {}
     }));
-    _subs.add(_b.watchPresence(partnerId).listen((p) => state = state.copyWith(partnerPresence: p)));
+    _subs.add(_b.watchPresence(partnerId).listen((p) {
+      final now = DateTime.now();
+      final was = state.partnerPresence?.isPausedNow(now);
+      state = state.copyWith(partnerPresence: p);
+      if (was != null && was != p.isPausedNow(now)) {
+        _notice(
+          p.isPausedNow(now)
+              ? AppNotice(emoji: '⏸️', title: '$_partnerName 暂停了位置共享', body: '恢复前看不到 TA 的最新位置', tab: 0)
+              : AppNotice(emoji: '📍', title: '$_partnerName 恢复了位置共享', body: '又能看到 TA 的位置了', tab: 0),
+          NotifIds.share,
+        );
+      }
+    }));
     _subs.add(_b.watchEvents(couple.id).listen((e) => _onEvent(ch, e, notify: true)));
-    _subs.add(_b.watchPins(couple.id).listen((_) => _loadPins(couple, ch)));
+    _subs.add(_b.watchPins(couple.id).listen((_) => _loadPins(couple, ch, notify: true)));
     _timer = Timer.periodic(const Duration(seconds: 30), (_) => _poll(couple, ch, partnerId));
     // 自己最近一个点
     _refreshMine();
@@ -272,6 +315,7 @@ class SyncNotifier extends Notifier<SyncState> {
       AppLog.w('sync', '拉取事件失败：$e');
     }
     await _loadPins(couple, ch);
+    _pinsReady = true;
     // 状态
     // （首次状态通过 realtime 到达；这里无需额外拉取）
   }
@@ -351,17 +395,19 @@ class SyncNotifier extends Notifier<SyncState> {
       }
       state = state.copyWith(events: list, pendingSos: pending);
       if (notify && fromPartner) {
-        final name = state.partner?.nickname.isNotEmpty == true ? state.partner!.nickname : 'TA';
         switch (ev.kind) {
           case EventKind.sos:
-            LocalNotifier.instance.show(NotifIds.sos, '🚨 $name 需要帮助！', '对方发起了 SOS 紧急求助，请立即查看', sos: true, payload: 'sos');
+            _notice(AppNotice(emoji: '🚨', title: '$_partnerName 需要帮助！', body: '对方发起了 SOS 紧急求助，请立即查看', urgent: true), NotifIds.sos);
           case EventKind.arrived:
-            LocalNotifier.instance.show(NotifIds.arrived, '🏠 $name 报平安了', ev.text?.isNotEmpty == true ? ev.text! : '已安全到达', payload: 'arrived');
+            _notice(AppNotice(emoji: '🏠', title: '$_partnerName 报平安了', body: ev.text?.isNotEmpty == true ? ev.text! : '已安全到达', tab: 2), NotifIds.arrived);
           case EventKind.poke:
-            LocalNotifier.instance.show(NotifIds.poke, '$name 戳了你一下', '${ev.emoji ?? '👋'} 点开看看', payload: 'poke');
+            _notice(AppNotice(emoji: ev.emoji ?? '👋', title: '$_partnerName 戳了你一下', body: '点开看看', tab: 2), NotifIds.poke);
           case EventKind.ack:
-            LocalNotifier.instance.show(NotifIds.arrived, '$name 回复了', '收到 ✔️', payload: 'ack');
-          default:
+            _notice(AppNotice(emoji: '✔️', title: '$_partnerName 回复了', body: '收到', tab: 2), NotifIds.arrived);
+          case EventKind.sosCancel:
+            _notice(AppNotice(emoji: '🕊️', title: '$_partnerName 取消了 SOS', body: '对方已平安', tab: 2), NotifIds.sos);
+          case EventKind.sosAck:
+            _notice(AppNotice(emoji: '🤝', title: '$_partnerName 已确认你的 SOS', body: 'TA 正在赶来', tab: 2), NotifIds.sos);
         }
         pokeStream.add(ev);
       }
@@ -377,7 +423,7 @@ class SyncNotifier extends Notifier<SyncState> {
   /// 新到达的对方事件（供页面播放动画）。
   final pokeStream = StreamController<CoupleEvent>.broadcast();
 
-  Future<void> _loadPins(CoupleDto couple, SecureChannel ch) async {
+  Future<void> _loadPins(CoupleDto couple, SecureChannel ch, {bool notify = false}) async {
     try {
       final rows = await _b.fetchPins(couple.id);
       final out = <MapPin>[];
@@ -397,7 +443,15 @@ class SyncNotifier extends Notifier<SyncState> {
           ));
         } catch (_) {}
       }
+      final known = state.pins.map((p) => p.id).toSet();
       state = state.copyWith(pins: out);
+      if (notify && _pinsReady) {
+        final added = out.where((p) => !known.contains(p.id) && p.ownerId != _b.userId).toList();
+        if (added.isNotEmpty) {
+          final p = added.last;
+          _notice(AppNotice(emoji: p.emoji, title: '$_partnerName 添加了共同标记', body: p.name.isEmpty ? '在地图上看看' : p.name, tab: 0), NotifIds.pin);
+        }
+      }
     } catch (_) {}
   }
 
